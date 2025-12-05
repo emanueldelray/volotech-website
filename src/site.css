@@ -1,0 +1,371 @@
+:root{
+  --brand:#003DA5;
+  --ink:#111827;
+  --muted:#4b5563;
+  --line:#e5e7eb;
+  --bg:#f6f7fb;
+  --accent:#0f766e; /* subtle teal accent */
+}
+
+/* Make anchor jumps respect the sticky navbar height */
+section[id] {
+  scroll-margin-top: 90px; /* adjust 80–100px depending on your header height */
+}
+#portfolio-top {
+  scroll-margin-top: 90px;
+}
+
+/* Smooth scrolling for in-page navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size:16px;
+  line-height:1.5;
+}
+
+/* Typography hierarchy */
+h1,h2,h3{letter-spacing:-.015em; margin:0;}
+
+h1{
+  font-size:clamp(2.2rem, 2.2vw + 1.6rem, 2.8rem);
+  line-height:1.15;
+  margin-bottom:0.75rem;
+}
+
+h2{
+  font-size:clamp(1.7rem, 1.7vw + 1.1rem, 2.1rem);
+  line-height:1.2;
+  margin-bottom:0.5rem;
+}
+
+h3{
+  font-size:1.25rem;
+  line-height:1.3;
+  margin-bottom:0.35rem;
+}
+
+p{margin:0;}
+
+a{color:var(--brand); text-decoration:none}
+a:hover{opacity:.9}
+button{cursor:pointer}
+
+/* Generic section spacing (hero has its own inner spacing as well) */
+section{
+  padding-top:3.5rem;
+  padding-bottom:3.5rem;
+}
+
+/* Cards, buttons, pills */
+.card{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(16,24,40,.06);
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.8rem 1.1rem;
+  border-radius:10px;
+  font-weight:600;
+}
+
+.btn-primary{background:var(--brand) !important; color:#fff !important}
+.btn-ghost{border:1px solid var(--line); background:#fff; color:var(--brand)}
+
+.pill{
+  border:1px solid var(--line);
+  background:#fff;
+  padding:.45rem .9rem;
+  border-radius:999px;
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+/* Step number badge */
+.step-dot{
+  position:absolute;
+  top:-12px;
+  left:-12px;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  display:grid;
+  place-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+/* Nav links (for React version we use .nav-plain as well) */
+.navlink{
+  background:transparent;
+  color:var(--muted);
+  border:0;
+  padding:0;
+  border-radius:0;
+  box-shadow:none;
+  outline:none;
+  font:inherit;
+  cursor:pointer;
+}
+.navlink:hover{ color:var(--brand); }
+
+/* ========================================================= */
+/* ==========    SERVICES HOVER CARDS (FINAL)      ========= */
+/* ========================================================= */
+
+/* Whole card */
+.service-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  box-shadow:0 6px 20px rgba(16,24,40,.06);
+  transition:transform .25s ease, box-shadow .25s ease;
+
+  /* FIXED HEIGHT → no layout shift across the row */
+  height:280px;
+}
+.service-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(16,24,40,.10);
+}
+
+/* Image container */
+.service-media{
+  position:relative;
+  width:100%;
+  height:100%;
+  background:#f3f4f6;
+}
+
+/* Main image */
+.service-image{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:grayscale(100%);
+  transform:scale(1.02);
+  transition:filter .35s ease, transform .35s ease;
+}
+.service-card:hover .service-image{
+  filter:grayscale(0%);
+  transform:scale(1.06);
+}
+
+/* Title overlay on bottom of image */
+.service-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.35) 100%);
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-start;
+  padding:12px 14px;
+}
+.service-title{
+  color:#fff;
+  font-weight:700;
+  font-size:1.05rem;
+  text-shadow:0 1px 2px rgba(0,0,0,.4);
+  letter-spacing:.2px;
+}
+
+/* BULLET TEXT PANEL – slides INSIDE the photo */
+.service-body{
+  position:absolute;
+  left:0;
+  right:0;
+
+  /* leave room for the service title at the very bottom */
+  bottom:40px;
+
+  /* padding so the text starts higher and ends above the title */
+  padding:16px 16px 12px 16px;
+  background:rgba(15,23,42,.25);
+
+  /* Start hidden slightly below its final position */
+  transform:translateY(110%);
+  opacity:0;
+
+  transition:
+    transform .25s ease,
+    opacity .25s ease;
+}
+
+/* On hover, slide the panel UP */
+.service-card:hover .service-body{
+  transform:translateY(0);
+  opacity:1;
+}
+
+.service-body ul{
+  margin:0;
+  padding-left:18px;
+  color:#f9fafb;
+  font-size:.9rem;
+}
+
+/* Placeholder image fallback */
+.service-placeholder{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  color:#9ca3af;
+  font-size:.9rem;
+}
+
+/* ========================================================= */
+/* ==========    SCROLL REVEAL ANIMATIONS        ========== */
+/* ========================================================= */
+
+.reveal{
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .45s ease, transform .45s ease;
+}
+.reveal.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ========================================================= */
+/* ==========          LIGHTBOX CONTROLS          ========= */
+/* ========================================================= */
+
+.lightbox-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  padding:.5rem .75rem;
+  border-radius:999px;
+  color:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.12);
+}
+.lightbox-btn.left{ left:1rem; }
+.lightbox-btn.right{ right:1rem; }
+.lightbox-btn:hover{ background:rgba(255,255,255,.2); }
+
+.lightbox-close{
+  position:absolute;
+  right:1rem;
+  top:1rem;
+  padding:.35rem .65rem;
+  border-radius:999px;
+  color:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.12);
+}
+.lightbox-close:hover{ background:rgba(255,255,255,.2); }
+
+/* ============================================ */
+/* ========== HOME – full-width image rows ==== */
+/* ============================================ */
+
+.home-row {
+  position: relative;
+  margin-top: 2.75rem;
+  background: #ffffff;
+}
+
+.home-row-inner {
+  max-width: 72rem;        /* like max-w-6xl */
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+/* Image container */
+.home-row-media {
+  position: relative;
+  width: 100%;
+  height: 22rem;           /* adjust height here if you want them taller/shorter */
+  background-size: cover;
+  background-position: center;
+  border-radius: 0;        /* no rounded corners → no visible edge */
+  box-shadow: none;        /* no shadow outline */
+  overflow: hidden;
+}
+
+/* Gradient overlay that hides the far edge completely */
+.home-row-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* LEFT image → fade out to the RIGHT into pure white */
+.home-row-left .home-row-media::after {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0.7) 75%,
+    #ffffff 100%
+  );
+}
+
+/* RIGHT image → fade out to the LEFT into pure white */
+.home-row-right .home-row-media::after {
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0.7) 75%,
+    #ffffff 100%
+  );
+}
+
+/* Text block */
+.home-row-content {
+  max-width: 32rem;
+}
+
+/* Desktop layout: side-by-side and image pushed to page edge */
+@media (min-width: 1024px) {
+  .home-row-inner {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* Manufacturing & Digital: image on LEFT */
+  .home-row-left .home-row-media {
+    flex: 1.2;
+    margin-right: 1.75rem;
+    margin-left: calc(50% - 50vw);   /* extend all the way to LEFT viewport edge */
+  }
+  .home-row-left .home-row-content {
+    flex: 1;
+  }
+
+  /* Assembly: image on RIGHT */
+  .home-row-right .home-row-media {
+    flex: 1.2;
+    margin-left: 1.75rem;
+    margin-right: calc(50% - 50vw);  /* extend all the way to RIGHT viewport edge */
+    order: 2;
+  }
+  .home-row-right .home-row-content {
+    flex: 1;
+    order: 1;
+  }
+}
