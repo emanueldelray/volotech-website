@@ -140,18 +140,21 @@ export default function App() {
   else page = <HomePage lang={lang} />;
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: LIGHT_GRAY, color: DARK_TEXT }}
-    >
-      <StyleFix />
-      {/* 🔹 Make sure Navbar receives language + setter */}
-      <Navbar lang={lang} setLang={setLang} />
+  <div
+    className="min-h-screen"
+    style={{ backgroundColor: LIGHT_GRAY, color: DARK_TEXT }}
+  >
+    <StyleFix />
+    <Navbar lang={lang} setLang={setLang} />
+
+    {/* Main content area */}
+    <main>
       {page}
-      <Footer />
-    </div>
-  );
-}
+    </main>
+
+    <Footer />
+  </div>
+);
 
 /* ===== Reusable section header ===== */
 
@@ -188,66 +191,65 @@ function Navbar({ lang, setLang }) {
 
   return (
     <header className="site-header shadow-sm">
-  <div className="max-w-6xl mx-auto nav-inner">
-    {/* Logo + tagline */}
-    <div className="flex items-center gap-3">
-      <img
-        src={volotechLogo}
-        alt="Volotech Logo"
-        style={{ height: 32 }}
-      />
-      <div>
-        <div className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-          Volotech
+      <div className="max-w-6xl mx-auto nav-inner">
+        {/* Logo + tagline */}
+        <div className="flex items-center gap-3">
+          <img
+            src={volotechLogo}
+            alt="Volotech Logo"
+            style={{ height: 32 }}
+          />
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+              Volotech
+            </div>
+            <div className="text-sm font-semibold text-neutral-900">
+              Präzision. Qualität. Zuverlässigkeit.
+            </div>
+          </div>
         </div>
-        <div className="text-sm font-semibold text-neutral-900">
-          Präzision. Qualität. Zuverlässigkeit.
+
+        {/* Main nav links */}
+        <nav className="nav-links text-sm font-medium">
+          <a href="#/" className="navlink">Start</a>
+          <a href="#/manufacturing" className="navlink">Fertigung</a>
+          <a href="#/assembly" className="navlink">Montage</a>
+          <a href="#/digital" className="navlink">Digital</a>
+          <a href="#/portfolio" className="navlink">Referenzen</a>
+          <a href="#/about" className="navlink">Über uns</a>
+        </nav>
+
+        {/* Language switch + RFQ button */}
+        <div className="nav-right flex items-center gap-3">
+          <div className="flex items-center gap-1 border rounded-full px-2 py-[2px] bg-neutral-50">
+            <button
+              type="button"
+              className="navlink"
+              onClick={() => setLang("de")}
+              style={{ fontWeight: lang === "de" ? 700 : 500 }}
+            >
+              DE
+            </button>
+            <span className="text-neutral-400">/</span>
+            <button
+              type="button"
+              className="navlink"
+              onClick={() => setLang("en")}
+              style={{ fontWeight: lang === "en" ? 700 : 500 }}
+            >
+              EN
+            </button>
+          </div>
+
+          <a
+            href="#/manufacturing"
+            className="btn btn-primary text-xs sm:text-sm"
+          >
+            Anfrage stellen
+          </a>
         </div>
       </div>
-    </div>
-
-    {/* Main nav links */}
-    <nav className="nav-links text-sm font-medium">
-      <a href="#/" className="navlink">Start</a>
-      <a href="#/manufacturing" className="navlink">Fertigung</a>
-      <a href="#/assembly" className="navlink">Montage</a>
-      <a href="#/digital" className="navlink">Digital</a>
-      <a href="#/portfolio" className="navlink">Referenzen</a>
-      <a href="#/about" className="navlink">Über uns</a>
-    </nav>
-
-    {/* Language switch + RFQ button */}
-    <div className="nav-right flex items-center gap-3">
-      <div className="flex items-center gap-1 border rounded-full px-2 py-[2px] bg-neutral-50">
-        <button
-          type="button"
-          className="navlink"
-          onClick={() => setLang("de")}
-          style={{ fontWeight: lang === "de" ? 700 : 500 }}
-        >
-          DE
-        </button>
-        <span className="text-neutral-400">/</span>
-        <button
-          type="button"
-          className="navlink"
-          onClick={() => setLang("en")}
-          style={{ fontWeight: lang === "en" ? 700 : 500 }}
-        >
-          EN
-        </button>
-      </div>
-
-      <a
-        href="#/manufacturing"
-        className="btn btn-primary text-xs sm:text-sm"
-      >
-        Anfrage stellen
-      </a>
-    </div>
-  </div>
-</header>
-</header>
+    </header>
   );
 }
 
