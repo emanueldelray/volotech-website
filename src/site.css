@@ -451,3 +451,13 @@ section{
     padding-right: 1rem;
   }
 }
+
+/* Final safety net: never allow horizontal scrolling  */
+body,
+#root,
+main {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+

@@ -187,123 +187,67 @@ function Navbar({ lang, setLang }) {
   const isDe = lang === "de";
 
   return (
-    <header
-      className="sticky top-0 z-40"
-      style={{
-        backgroundColor: "#ffffff",
-        borderBottom: `1px solid ${MID_GRAY}`,
-        boxShadow: "0 6px 18px rgba(15,23,42,0.08)",
-      }}
-    >
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-8">
-        {/* Brand block with REAL logo */}
-        <a
-          href="#/"
-          className="flex items-center gap-3 flex-shrink-0"
-          style={{ textDecoration: "none" }}
-        >
-          <img
-            src={volotechLogo}
-            alt="Volotech logo"
-            className="flex-shrink-0"
-            style={{ height: "40px", width: "auto" }}
-          />
-
-          <div className="leading-tight">
-            <div
-              style={{
-                fontSize: "1.25rem",
-                fontWeight: 800,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-                color: DARK_TEXT,
-              }}
-            >
-              Volotech
-            </div>
-            <div
-              style={{
-                fontSize: "0.72rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                marginTop: "2px",
-                color: MID_TEXT,
-              }}
-            >
-              {isDe
-                ? "Präzision. Qualität. Zuverlässigkeit"
-                : "Precision. Quality. Reliability"}
-            </div>
-          </div>
-        </a>
-
-        {/* Right side: nav + language + CTA */}
-        <div className="flex items-center gap-4 flex-1 justify-end">
-          {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-7 text-[0.9rem] text-neutral-600 ml-4">
-            <a href="#/" className="nav-plain hover:text-black">
-              {isDe ? "Start" : "Home"}
-            </a>
-            <a href="#/manufacturing" className="nav-plain hover:text-black">
-              {isDe ? "Fertigung" : "Manufacturing"}
-            </a>
-            <a href="#/assembly" className="nav-plain hover:text-black">
-              {isDe ? "Montage" : "Assembly"}
-            </a>
-            <a href="#/digital" className="nav-plain hover:text-black">
-              {isDe ? "Digital" : "Digital"}
-            </a>
-            <a href="#/portfolio" className="nav-plain hover:text-black">
-              {isDe ? "Referenzen" : "Portfolio"}
-            </a>
-            <a href="#/about" className="nav-plain hover:text-black">
-              {isDe ? "Über uns" : "About"}
-            </a>
-          </nav>
-
-          {/* Language switcher – visible also on mobile */}
-          <div className="flex items-center gap-1 text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => setLang("en")}
-              className="px-2 py-1 rounded-md border text-[0.7rem]"
-              style={{
-                borderColor: lang === "en" ? BMW_BLUE : MID_GRAY,
-                color: lang === "en" ? BMW_BLUE : MID_TEXT,
-                opacity: lang === "en" ? 1 : 0.7,
-              }}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => setLang("de")}
-              className="px-2 py-1 rounded-md border text-[0.7rem]"
-              style={{
-                borderColor: lang === "de" ? BMW_BLUE : MID_GRAY,
-                color: lang === "de" ? BMW_BLUE : MID_TEXT,
-                opacity: lang === "de" ? 1 : 0.7,
-              }}
-            >
-              DE
-            </button>
-          </div>
-
-          {/* RFQ CTA */}
-          <a
-            href="#/manufacturing&rfq"
-            className="btn-rfq hidden md:inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold shadow-sm hover:opacity-90 flex-shrink-0"
-            style={{
-              backgroundColor: BMW_BLUE,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
-          >
-            {isDe ? "Anfrage stellen" : BRAND.cta}
-          </a>
+    <header className="site-header shadow-sm">
+  <div className="max-w-6xl mx-auto nav-inner">
+    {/* Logo + tagline */}
+    <div className="flex items-center gap-3">
+      <img
+        src={volotechLogo}
+        alt="Volotech Logo"
+        style={{ height: 32 }}
+      />
+      <div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+          Volotech
+        </div>
+        <div className="text-sm font-semibold text-neutral-900">
+          Präzision. Qualität. Zuverlässigkeit.
         </div>
       </div>
-    </header>
+    </div>
+
+    {/* Main nav links */}
+    <nav className="nav-links text-sm font-medium">
+      <a href="#/" className="navlink">Start</a>
+      <a href="#/manufacturing" className="navlink">Fertigung</a>
+      <a href="#/assembly" className="navlink">Montage</a>
+      <a href="#/digital" className="navlink">Digital</a>
+      <a href="#/portfolio" className="navlink">Referenzen</a>
+      <a href="#/about" className="navlink">Über uns</a>
+    </nav>
+
+    {/* Language switch + RFQ button */}
+    <div className="nav-right flex items-center gap-3">
+      <div className="flex items-center gap-1 border rounded-full px-2 py-[2px] bg-neutral-50">
+        <button
+          type="button"
+          className="navlink"
+          onClick={() => setLang("de")}
+          style={{ fontWeight: lang === "de" ? 700 : 500 }}
+        >
+          DE
+        </button>
+        <span className="text-neutral-400">/</span>
+        <button
+          type="button"
+          className="navlink"
+          onClick={() => setLang("en")}
+          style={{ fontWeight: lang === "en" ? 700 : 500 }}
+        >
+          EN
+        </button>
+      </div>
+
+      <a
+        href="#/manufacturing"
+        className="btn btn-primary text-xs sm:text-sm"
+      >
+        Anfrage stellen
+      </a>
+    </div>
+  </div>
+</header>
+</header>
   );
 }
 
@@ -736,7 +680,7 @@ function ManufacturingPage({ lang }) {
         "3- und 5-Achs-Fräsen plus CNC-Drehen",
         "Stahl, Edelstahl, Aluminium, Messing und technische Kunststoffe",
         "Typische Toleranz ±0,02 mm (bis 0,01 mm nach Rücksprache möglich)",
-        "Prototypen, Vorrichtungen sowie Klein- und Mittelserien für den industriellen Einsatz",
+        "Prototypen, Vorrichtungen sowie Serienteile für den industriellen Einsatz",
       ]
     : [
         "3- and 5-axis milling plus CNC turning",
