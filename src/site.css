@@ -1,3 +1,30 @@
+/* Global reset / mobile friendliness */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* prevents sideways scrolling */
+}
+
+/* Images should never overflow on small screens */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+#root {
+  width: 100%;
+}
+
 :root{
   --brand:#003DA5;
   --ink:#111827;
@@ -367,5 +394,60 @@ section{
   .home-row-right .home-row-content {
     flex: 1;
     order: 1;
+  }
+}
+
+/* ------------------------- */
+/* MOBILE NAV + LAYOUT FIXES */
+/* ------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: white;
+}
+
+/* This is the flex container around logo + links + button */
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 0.75rem 1rem;
+}
+
+/* Links row */
+.nav-links {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Make everything wrap nicely on small screens */
+@media (max-width: 768px) {
+  .nav-inner {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .nav-links {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    font-size: 0.85rem;
+    row-gap: 0.25rem;
+  }
+
+  .nav-right {
+    font-size: 0.85rem;
+  }
+}
+
+/* Ensure sections don't overflow on mobile */
+@media (max-width: 768px) {
+  main,
+  section {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
