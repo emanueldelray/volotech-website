@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import "./site.css";
 import volotechLogo from "./assets/volotech-logo.png";
 import AboutPage from "./about/AboutPage";   // 👈 add this line
+import { Routes, Route, Link } from "react-router-dom";
+
 
 /* ===== Auto-load images ===== */
 
@@ -86,23 +88,13 @@ function useHashRoute() {
 /* ===== App root ===== */
 
 export default function App() {
-  const route = useHashRoute();
-
   // 🔹 language state: default German
   const [lang, setLang] = useState("de"); // "de" or "en"
 
-  const isManufacturing = route.startsWith("#/manufacturing");
-  const isAssembly = route.startsWith("#/assembly");
-  const isDigital = route.startsWith("#/digital");
-  const isPortfolio = route.startsWith("#/portfolio");
-  const isAbout = route.startsWith("#/about");
-  const isImpressum = route.startsWith("#/impressum");
-  const isPrivacy = route.startsWith("#/datenschutz");
-
-  // Scroll to top on route change
+  // Scroll to top on route change (React Router updates location)
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, [route]);
+  }, []);
 
   // Scroll-reveal: add .visible to .reveal elements when they enter viewport
   useEffect(() => {
@@ -126,18 +118,7 @@ export default function App() {
     els.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, [route]);
-
-    // 🔹 choose page based on route
-  let page;
-  if (isManufacturing) page = <ManufacturingPage lang={lang} />;
-  else if (isAssembly) page = <AssemblyPage lang={lang} />;
-  else if (isDigital) page = <DigitalPage lang={lang} />;
-  else if (isPortfolio) page = <PortfolioPage lang={lang} />;
-  else if (isAbout) page = <AboutPage lang={lang} />;
-  else if (isImpressum) page = <ImpressumPage />;
-  else if (isPrivacy) page = <PrivacyPage />;
-  else page = <HomePage lang={lang} />;
+  }, []);
 
   return (
     <div
@@ -145,9 +126,25 @@ export default function App() {
       style={{ backgroundColor: LIGHT_GRAY, color: DARK_TEXT }}
     >
       <StyleFix />
-      {/* 🔹 Navbar gets language + setter */}
       <Navbar lang={lang} setLang={setLang} />
-      <main>{page}</main>
+
+      {/* React Router decides which page to show */}
+      <Routes>
+        <Route path="/" element={<HomePage lang={lang} />} />
+        <Route
+          path="/manufacturing"
+          element={<ManufacturingPage lang={lang} />}
+        />
+        <Route path="/assembly" element={<AssemblyPage lang={lang} />} />
+        <Route path="/digital" element={<DigitalPage lang={lang} />} />
+        <Route path="/portfolio" element={<PortfolioPage lang={lang} />} />
+        <Route path="/about" element={<AboutPage lang={lang} />} />
+        <Route path="/impressum" element={<ImpressumPage />} />
+        <Route path="/datenschutz" element={<PrivacyPage />} />
+        {/* Optional: catch-all → home */}
+        <Route path="*" element={<HomePage lang={lang} />} />
+      </Routes>
+
       <Footer />
     </div>
   );
@@ -184,72 +181,26 @@ export const SectionHeader = ({ title, subtitle }) => (
 
 /* ===== Navbar ===== */
 
-function Navbar({ lang, setLang }) {
-  const isDe = lang === "de";
-
-  return (
-    <header className="site-header shadow-sm">
-      <div className="max-w-6xl mx-auto nav-inner">
-        {/* Logo + tagline */}
-        <div className="flex items-center gap-3">
-          <img
-            src={volotechLogo}
-            alt="Volotech Logo"
-            style={{ height: 32 }}
-          />
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-              Volotech
-            </div>
-            <div className="text-sm font-semibold text-neutral-900">
-              Präzision. Qualität. Zuverlässigkeit.
-            </div>
-          </div>
-        </div>
-
-        {/* Main nav links */}
         <nav className="nav-links text-sm font-medium">
-          <a href="#/" className="navlink">Start</a>
-          <a href="#/manufacturing" className="navlink">Fertigung</a>
-          <a href="#/assembly" className="navlink">Montage</a>
-          <a href="#/digital" className="navlink">Digital</a>
-          <a href="#/portfolio" className="navlink">Referenzen</a>
-          <a href="#/about" className="navlink">Über uns</a>
+          <Link to="/" className="navlink">
+            Start
+          </Link>
+          <Link to="/manufacturing" className="navlink">
+            Fertigung
+          </Link>
+          <Link to="/assembly" className="navlink">
+            Montage
+          </Link>
+          <Link to="/digital" className="navlink">
+            Digital
+          </Link>
+          <Link to="/portfolio" className="navlink">
+            Referenzen
+          </Link>
+          <Link to="/about" className="navlink">
+            Über uns
+          </Link>
         </nav>
-
-        {/* Language switch + RFQ button */}
-        <div className="nav-right flex items-center gap-3">
-          <div className="flex items-center gap-1 border rounded-full px-2 py-[2px] bg-neutral-50">
-            <button
-              type="button"
-              className="navlink"
-              onClick={() => setLang("de")}
-              style={{ fontWeight: lang === "de" ? 700 : 500 }}
-            >
-              DE
-            </button>
-            <span className="text-neutral-400">/</span>
-            <button
-              type="button"
-              className="navlink"
-              onClick={() => setLang("en")}
-              style={{ fontWeight: lang === "en" ? 700 : 500 }}
-            >
-              EN
-            </button>
-          </div>
-
-          <a
-            href="#/manufacturing"
-            className="btn btn-primary text-xs sm:text-sm"
-          >
-            Anfrage stellen
-          </a>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 /* =========================================================
    HOME PAGE – simple, less text, 3 main services overview
@@ -315,24 +266,26 @@ function HomePage({ lang }) {
               </p>
 
               <div className="mt-8 flex gap-3 flex-wrap">
-                <a
-                  href="#/manufacturing"
-                  className="btn-rfq inline-flex items-center gap-2 rounded-md px-5 py-3 font-medium shadow-sm hover:opacity-90"
-                  style={{ backgroundColor: BMW_BLUE }}
-                >
-                  {isDe ? "Fertigungsleistungen" : "Manufacturing services"}
-                </a>
-                <a
-                  href="#/digital"
-                  className="inline-flex items-center gap-2 rounded-md px-5 py-3 border text-sm sm:text-base"
-                  style={{
-                    borderColor: "rgba(255,255,255,0.7)",
-                    backgroundColor: "rgba(15,23,42,0.4)",
-                    color: "#e5e7eb",
-                  }}
-                >
-                  {isDe ? "Digitale & Web-Unterstützung" : "Digital & web support"}
-                </a>
+                <Link
+  to="/manufacturing"
+  className="btn-rfq inline-flex items-center gap-2 rounded-md px-5 py-3 font-medium shadow-sm hover:opacity-90"
+  style={{ backgroundColor: BMW_BLUE }}
+>
+  {isDe ? "Fertigungsleistungen" : "Manufacturing services"}
+</Link>
+
+                <Link
+  to="/digital"
+  className="inline-flex items-center gap-2 rounded-md px-5 py-3 border text-sm sm:text-base"
+  style={{
+    borderColor: "rgba(255,255,255,0.7)",
+    backgroundColor: "rgba(15,23,42,0.4)",
+    color: "#e5e7eb",
+  }}
+>
+  {isDe ? "Digitale & Web-Unterstützung" : "Digital & web support"}
+</Link>
+
               </div>
             </div>
 
@@ -611,13 +564,14 @@ function HomePage({ lang }) {
                 ? "Sie können mit einem Einzelteil, einer kleinen Vorrichtung oder einem gemischten RFQ-Paket starten. Hängen Sie STEP/PDF/DXF-Dateien an und schreiben Sie kurz dazu, was wichtiger ist – Kosten, Lieferzeit oder Flexibilität."
                 : "You can start with a single part, a small fixture or a mixed RFQ package. Attach STEP/PDF/DXF files and a short note on priorities — cost, lead time or flexibility."}
             </p>
-            <a
-              href="#/manufacturing?rfq"
-              className="btn-rfq inline-flex items-center gap-2 rounded-md px-5 py-3 mt-5 font-medium shadow-sm hover:opacity-90"
-              style={{ backgroundColor: BMW_BLUE }}
-            >
-              {isDe ? "Zum RFQ-Formular" : "Go to RFQ form"}
-            </a>
+            <Link
+  to="/manufacturing?rfq"
+  className="btn-rfq inline-flex items-center gap-2 rounded-md px-5 py-3 mt-5 font-medium shadow-sm hover:opacity-90"
+  style={{ backgroundColor: BMW_BLUE }}
+>
+  {isDe ? "Zum RFQ-Formular" : "Go to RFQ form"}
+</Link>
+
           </div>
           <div
             className="rounded-xl border bg-white p-5 shadow-sm text-sm reveal"
