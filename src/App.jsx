@@ -266,26 +266,24 @@ function HomePage({ lang }) {
               </p>
 
               <div className="mt-8 flex gap-3 flex-wrap">
-                <Link
-  to="/manufacturing"
-  className="btn-rfq inline-flex items-center gap-2 rounded-md px-5 py-3 font-medium shadow-sm hover:opacity-90"
-  style={{ backgroundColor: BMW_BLUE }}
->
-  {isDe ? "Fertigungsleistungen" : "Manufacturing services"}
-</Link>
-
-                <Link
-  to="/digital"
-  className="inline-flex items-center gap-2 rounded-md px-5 py-3 border text-sm sm:text-base"
-  style={{
-    borderColor: "rgba(255,255,255,0.7)",
-    backgroundColor: "rgba(15,23,42,0.4)",
-    color: "#e5e7eb",
-  }}
->
-  {isDe ? "Digitale & Web-Unterstützung" : "Digital & web support"}
-</Link>
-
+                <a
+                  href="#/manufacturing"
+                  className="btn-rfq inline-flex items-center gap-2 rounded-md px-5 py-3 font-medium shadow-sm hover:opacity-90"
+                  style={{ backgroundColor: BMW_BLUE }}
+                >
+                  {isDe ? "Fertigungsleistungen" : "Manufacturing services"}
+                </a>
+                <a
+                  href="#/digital"
+                  className="inline-flex items-center gap-2 rounded-md px-5 py-3 border text-sm sm:text-base"
+                  style={{
+                    borderColor: "rgba(255,255,255,0.7)",
+                    backgroundColor: "rgba(15,23,42,0.4)",
+                    color: "#e5e7eb",
+                  }}
+                >
+                  {isDe ? "Digitale & Web-Unterstützung" : "Digital & web support"}
+                </a>
               </div>
             </div>
 
@@ -564,14 +562,13 @@ function HomePage({ lang }) {
                 ? "Sie können mit einem Einzelteil, einer kleinen Vorrichtung oder einem gemischten RFQ-Paket starten. Hängen Sie STEP/PDF/DXF-Dateien an und schreiben Sie kurz dazu, was wichtiger ist – Kosten, Lieferzeit oder Flexibilität."
                 : "You can start with a single part, a small fixture or a mixed RFQ package. Attach STEP/PDF/DXF files and a short note on priorities — cost, lead time or flexibility."}
             </p>
-            <Link
-  to="/manufacturing?rfq"
-  className="btn-rfq inline-flex items-center gap-2 rounded-md px-5 py-3 mt-5 font-medium shadow-sm hover:opacity-90"
-  style={{ backgroundColor: BMW_BLUE }}
->
-  {isDe ? "Zum RFQ-Formular" : "Go to RFQ form"}
-</Link>
-
+            <a
+              href="#/manufacturing?rfq"
+              className="btn-rfq inline-flex items-center gap-2 rounded-md px-5 py-3 mt-5 font-medium shadow-sm hover:opacity-90"
+              style={{ backgroundColor: BMW_BLUE }}
+            >
+              {isDe ? "Zum RFQ-Formular" : "Go to RFQ form"}
+            </a>
           </div>
           <div
             className="rounded-xl border bg-white p-5 shadow-sm text-sm reveal"
