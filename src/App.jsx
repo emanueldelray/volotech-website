@@ -128,7 +128,7 @@ export default function App() {
     return () => observer.disconnect();
   }, [route]);
 
-  // 🔹 choose page based on route
+    // 🔹 choose page based on route
   let page;
   if (isManufacturing) page = <ManufacturingPage lang={lang} />;
   else if (isAssembly) page = <AssemblyPage lang={lang} />;
@@ -140,21 +140,19 @@ export default function App() {
   else page = <HomePage lang={lang} />;
 
   return (
-  <div
-    className="min-h-screen"
-    style={{ backgroundColor: LIGHT_GRAY, color: DARK_TEXT }}
-  >
-    <StyleFix />
-    <Navbar lang={lang} setLang={setLang} />
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: LIGHT_GRAY, color: DARK_TEXT }}
+    >
+      <StyleFix />
+      {/* 🔹 Navbar gets language + setter */}
+      <Navbar lang={lang} setLang={setLang} />
+      <main>{page}</main>
+      <Footer />
+    </div>
+  );
+}
 
-    {/* Main content area */}
-    <main>
-      {page}
-    </main>
-
-    <Footer />
-  </div>
-);
 
 /* ===== Reusable section header ===== */
 
