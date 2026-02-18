@@ -36,7 +36,7 @@ export default function HomePage({ lang = "de" }) {
         <div
           style={{
             position: "absolute", inset: 0,
-            background: "linear-gradient(100deg, rgba(11,42,92,0.82) 0%, rgba(11,42,92,0.55) 50%, rgba(0,0,0,0.3) 100%)",
+            background: "linear-gradient(100deg, rgba(27,45,69,0.88) 0%, rgba(27,45,69,0.60) 50%, rgba(0,0,0,0.35) 100%)",
           }}
         />
 
@@ -70,7 +70,7 @@ export default function HomePage({ lang = "de" }) {
               <Link to="/manufacturing?rfq=1" className="btn-primary" style={{ fontSize: "1rem", padding: "0.85rem 1.3rem" }}>
                 {isDe ? "Anfrage stellen" : "Request a quote"}
               </Link>
-              <Link to="/about" className="btn-ghost" style={{ color: "#fff", borderColor: "rgba(255,255,255,0.5)", background: "transparent" }}>
+              <Link to="/about" className="btn-ghost" style={{ color: "#fff", borderColor: "rgba(255,255,255,0.6)", background: "rgba(255,255,255,0.1)", backdropFilter: "blur(4px)" }}>
                 {isDe ? "Mehr erfahren" : "Learn more"}
               </Link>
             </div>
@@ -107,7 +107,7 @@ export default function HomePage({ lang = "de" }) {
       </section>
 
       {/* ================= WHAT WE DO ================= */}
-      <section id="services" className="reveal" style={{ background: "var(--bg)" }}>
+      <section id="services" className="reveal" style={{ background: "var(--bg-alt)" }}>
         <div className="section-wrap">
           <SectionHeader
             title={isDe ? "Was wir anbieten" : "What we offer"}
@@ -157,7 +157,7 @@ export default function HomePage({ lang = "de" }) {
       </section>
 
       {/* ================= HOW IT WORKS ================= */}
-      <section className="reveal" style={{ background: "#fff" }}>
+      <section className="reveal" style={{ background: "#fff", borderTop: "2px solid var(--line)" }}>
         <div className="section-wrap">
           <SectionHeader
             title={isDe ? "So funktioniert die Zusammenarbeit" : "How it works"}
@@ -217,7 +217,7 @@ export default function HomePage({ lang = "de" }) {
       </section>
 
       {/* ================= FIT CHECK ================= */}
-      <section className="reveal" style={{ background: "var(--bg)", borderTop: "1px solid var(--line)" }}>
+      <section className="reveal" style={{ background: "var(--bg-alt)", borderTop: "2px solid var(--line)" }}>
         <div className="section-wrap">
           <SectionHeader
             title={isDe ? "Passt Volotech zu Ihrem Projekt?" : "Is Volotech right for your project?"}
@@ -270,7 +270,7 @@ export default function HomePage({ lang = "de" }) {
       </section>
 
       {/* ================= WHY VOLOTECH ================= */}
-      <section className="reveal" style={{ background: "#fff", borderTop: "1px solid var(--line)" }}>
+      <section className="reveal" style={{ background: "#fff", borderTop: "2px solid var(--line)" }}>
         <div className="section-wrap">
           <SectionHeader
             title={isDe ? "Warum Volotech" : "Why Volotech"}
@@ -309,29 +309,31 @@ export default function HomePage({ lang = "de" }) {
       </section>
 
       {/* ================= CTA ================= */}
-      <section className="reveal" style={{ background: "var(--bg)", borderTop: "1px solid var(--line)" }}>
-        <div className="section-wrap">
-          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "2rem", alignItems: "center" }} className="grid-2">
-            <div>
-              <h2>{isDe ? "Haben Sie eine Zeichnung zu besprechen?" : "Have a drawing to discuss?"}</h2>
-              <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>
+      <section className="reveal" style={{ background: "var(--brand)", borderTop: "2px solid var(--line)" }}>
+        <div className="section-wrap" style={{ paddingTop: "3rem", paddingBottom: "3rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "2.5rem", alignItems: "center" }} className="grid-2">
+            <div style={{ color: "#fff" }}>
+              <h2 style={{ color: "#fff" }}>{isDe ? "Haben Sie eine Zeichnung zu besprechen?" : "Have a drawing to discuss?"}</h2>
+              <p style={{ color: "rgba(255,255,255,0.75)", marginTop: "0.5rem" }}>
                 {isDe
                   ? "Senden Sie Ihre Anfrage per E-Mail — Angebote meist innerhalb von 24–48 Stunden."
                   : "Send your request via email — quotes typically within 24–48 hours."}
               </p>
               <div style={{ marginTop: "1.25rem", display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
-                <CTAButton to="/manufacturing?rfq=1">
+                <Link to="/manufacturing?rfq=1" className="btn-primary" style={{ background: "#fff", color: "var(--brand)" }}>
                   {isDe ? "Zum Anfrageformular" : "Go to request form"}
-                </CTAButton>
-                <ResponseHint isDe={isDe} />
+                </Link>
+                <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.9rem" }}>
+                  {isDe ? "Rückmeldung in 24–48 h" : "Response within 24–48 h"}
+                </span>
               </div>
             </div>
 
-            <div className="v-card">
-              <div style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
+            <div style={{ background: "rgba(255,255,255,0.08)", border: "2px solid rgba(255,255,255,0.15)", borderRadius: "var(--radius-lg)", padding: "1.5rem" }}>
+              <div style={{ fontWeight: 700, marginBottom: "0.5rem", color: "#fff" }}>
                 {isDe ? "Typische Anfrageinhalte" : "Typical request contents"}
               </div>
-              <ul style={{ color: "var(--muted)", paddingLeft: "1.1rem", lineHeight: 1.7 }}>
+              <ul style={{ color: "rgba(255,255,255,0.8)", paddingLeft: "1.1rem", lineHeight: 1.7 }}>
                 <li>{isDe ? "Zeichnungen (STEP, PDF, DXF)" : "Drawings (STEP, PDF, DXF)"}</li>
                 <li>{isDe ? "Material & Menge" : "Material & quantity"}</li>
                 <li>{isDe ? "Gewünschter Liefertermin" : "Target delivery date"}</li>
@@ -348,9 +350,22 @@ export default function HomePage({ lang = "de" }) {
 /* ===== Local helper ===== */
 function RiskItem({ title, text }) {
   return (
-    <div style={{ padding: "0.75rem 0.85rem", borderRadius: "10px", background: "#fff", border: "1px solid rgba(11,42,92,0.08)" }}>
+    <div style={{ padding: "0.85rem 1rem", borderRadius: "10px", background: "#fff", border: "2px solid rgba(27,45,69,0.10)" }}>
       <div style={{ fontWeight: 650, fontSize: "0.93rem", color: "var(--ink)", marginBottom: "0.25rem" }}>{title}</div>
       <div style={{ fontSize: "0.9rem", lineHeight: 1.5, color: "var(--muted)" }}>{text}</div>
     </div>
   );
 }
+```
+
+Commit that. Then for **App.jsx** scroll fix, go to `https://github.com/emanueldelray/volotech-website/edit/main/src/App.jsx`, find:
+```
+  useEffect(() => {
+    // Small delay so DOM is ready after route change
+```
+
+And change it to:
+```
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // Small delay so DOM is ready after route change
