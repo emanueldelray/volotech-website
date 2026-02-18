@@ -15,6 +15,7 @@ function ScrollRevealManager() {
   const location = useLocation();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     // Small delay so DOM is ready after route change
     const timer = setTimeout(() => {
       const els = Array.from(document.querySelectorAll(".reveal"));
