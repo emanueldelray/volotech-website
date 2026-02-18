@@ -14,7 +14,8 @@ export default function ImpressumPage({ lang = "de" }) {
 
       <Section title={isDe ? "Diensteanbieter" : "Service Provider"}>
         <p>Emanuel Chitic</p>
-        <p>Volotech</p>
+       <p>Volotech</p>
+        <p>Staudeweg 6</p>
         <p>86368 Gersthofen</p>
         <p>{isDe ? "Deutschland" : "Germany"}</p>
       </Section>
