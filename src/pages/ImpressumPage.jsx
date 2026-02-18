@@ -43,6 +43,7 @@ export default function ImpressumPage({ lang = "de" }) {
 
       <Section title={isDe ? "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV" : "Responsible for content pursuant to § 18 (2) MStV"}>
         <p>Emanuel Chitic</p>
+        <p>Staudeweg 6</p>
         <p>86368 Gersthofen</p>
         <p>{isDe ? "Deutschland" : "Germany"}</p>
       </Section>
