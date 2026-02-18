@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 
-/* ===== HOME – SERVICE CARDS ===== */
+/* ===== HOME â€“ SERVICE CARDS ===== */
 
 .home-services {
   padding: 4rem 2rem;
@@ -129,7 +129,7 @@ img {
 
 /* Make anchor jumps respect the sticky navbar height */
 section[id] {
-  scroll-margin-top: 90px; /* adjust 80–100px depending on your header height */
+  scroll-margin-top: 90px; /* adjust 80â€“100px depending on your header height */
 }
 #portfolio-top {
   scroll-margin-top: 90px;
@@ -276,7 +276,7 @@ section{
   box-shadow:0 6px 20px rgba(16,24,40,.06);
   transition:transform .25s ease, box-shadow .25s ease;
 
-  /* FIXED HEIGHT → no layout shift across the row */
+  /* FIXED HEIGHT â†’ no layout shift across the row */
   height:280px;
 }
 .service-card:hover{
@@ -324,7 +324,7 @@ section{
   letter-spacing:.2px;
 }
 
-/* BULLET TEXT PANEL – slides INSIDE the photo */
+/* BULLET TEXT PANEL â€“ slides INSIDE the photo */
 .service-body{
   position:absolute;
   left:0;
@@ -412,7 +412,7 @@ section{
 .lightbox-close:hover{ background:rgba(255,255,255,.2); }
 
 /* ============================================ */
-/* ========== HOME – full-width image rows ==== */
+/* ========== HOME â€“ full-width image rows ==== */
 /* ============================================ */
 
 .home-row {
@@ -451,7 +451,7 @@ section{
   pointer-events: none;
 }
 
-/* LEFT image → fade out to the RIGHT into pure white */
+/* LEFT image â†’ fade out to the RIGHT into pure white */
 .home-row-left .home-row-media::after {
   background: linear-gradient(
     to right,
@@ -462,7 +462,7 @@ section{
   );
 }
 
-/* RIGHT image → fade out to the LEFT into pure white */
+/* RIGHT image â†’ fade out to the LEFT into pure white */
 .home-row-right .home-row-media::after {
   background: linear-gradient(
     to left,
@@ -509,10 +509,10 @@ section{
 }
 
 /* ------------------------- */
-/* NAVBAR – desktop + mobile */
+/* NAVBAR â€“ desktop + mobile */
 /* ------------------------- */
 
-/* Main navigation links – force horizontal layout */
+/* Main navigation links â€“ force horizontal layout */
 .nav-links {
   display: flex;
   align-items: center;
@@ -775,7 +775,7 @@ main {
   font-size: 0.82rem !important;
   line-height: 1.25 !important;
 }
-/* Sticky navbar “settles” after scroll */
+/* Sticky navbar â€œsettlesâ€ after scroll */
 .site-header--scrolled{
   box-shadow: 0 10px 24px rgba(2,6,23,0.10);
   border-bottom-color: rgba(229,231,235,0.85);
@@ -854,7 +854,7 @@ main {
 
 .footer-title {
   font-weight: 600;
-  color: #111827; /* ⬅️ solid black */
+  color: #111827; /* â¬…ï¸ solid black */
   margin-bottom: 0px;
 }
 
@@ -873,7 +873,7 @@ main {
 }
 
 .footer-nowrap {
-  white-space: nowrap; /* ✅ prevents email split */
+  white-space: nowrap; /* âœ… prevents email split */
 }
 
 .footer-col-right {
@@ -881,7 +881,7 @@ main {
 }
 
 .footer-legal {
-  line-height: 22px;  /* ✅ matches other lines exactly */
+  line-height: 22px;  /* âœ… matches other lines exactly */
 }
 
 .footer-copyright {
@@ -956,7 +956,7 @@ main {
   display: block;
 }
 
-/* ===== Warum Volotech – card contrast ===== */
+/* ===== Warum Volotech â€“ card contrast ===== */
 
 .why-card {
   background: #f5f8ff;          /* light brand blue */
