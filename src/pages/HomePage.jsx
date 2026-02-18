@@ -356,16 +356,3 @@ function RiskItem({ title, text }) {
     </div>
   );
 }
-```
-
-Commit that. Then for **App.jsx** scroll fix, go to `https://github.com/emanueldelray/volotech-website/edit/main/src/App.jsx`, find:
-```
-  useEffect(() => {
-    // Small delay so DOM is ready after route change
-```
-
-And change it to:
-```
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    // Small delay so DOM is ready after route change
