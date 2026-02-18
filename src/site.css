@@ -1,0 +1,973 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* ===== HOME – SERVICE CARDS ===== */
+
+.home-services {
+  padding: 4rem 2rem;
+  background: #f5f7fa;
+}
+
+.services-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* Card base */
+.service-card {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  text-decoration: none;
+  color: white;
+}
+
+/* Image */
+.service-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+/* Overlay */
+.service-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.75),
+    rgba(0,0,0,0.15)
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+  opacity: 0.85;
+  transition: opacity 0.4s ease;
+}
+
+/* Text */
+.service-overlay h3 {
+  font-size: 1.6rem;
+  margin: 0 0 0.4rem 0;
+  font-weight: 600;
+}
+
+.service-overlay p {
+  font-size: 0.95rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Hover effects */
+.service-card:hover img {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+.service-card:hover .service-overlay {
+  opacity: 1;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+  .service-card {
+    height: 300px;
+  }
+}
+
+
+/* Global reset / mobile friendliness */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* prevents sideways scrolling */
+}
+
+/* Images should never overflow on small screens */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+#root {
+  width: 100%;
+}
+
+:root{
+  --brand:#003DA5;
+  --ink:#111827;
+  --muted:#4b5563;
+  --line:#e5e7eb;
+  --bg:#f6f7fb;
+  --accent:#0f766e; /* subtle teal accent */
+
+  /* HERO BANDS (greyish + visible seam) */
+  --hero-band: #e7edf3;                 /* greyish-blue band */
+  --hero-band-edge: rgba(17,2,39,0.02); /* visible seam line (stronger than before) */
+}
+
+/* Make anchor jumps respect the sticky navbar height */
+section[id] {
+  scroll-margin-top: 90px; /* adjust 80–100px depending on your header height */
+}
+#portfolio-top {
+  scroll-margin-top: 90px;
+}
+
+/* Smooth scrolling for in-page navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size:16px;
+  line-height:1.5;
+}
+
+/* Typography hierarchy */
+h1,h2,h3{letter-spacing:-.015em; margin:0;}
+
+h1{
+  font-size:clamp(2.2rem, 2.2vw + 1.6rem, 2.8rem);
+  line-height:1.15;
+  margin-bottom:0.75rem;
+}
+
+h2{
+  font-size:clamp(1.7rem, 1.7vw + 1.1rem, 2.1rem);
+  line-height:1.2;
+  margin-bottom:0.5rem;
+}
+
+h3{
+  font-size:1.25rem;
+  line-height:1.3;
+  margin-bottom:0.35rem;
+}
+
+p{margin:0;}
+
+a{color:var(--brand); text-decoration:none}
+a:hover{opacity:.9}
+button{cursor:pointer}
+
+/* Generic section spacing (hero has its own inner spacing as well) */
+section{
+  padding-top:3.5rem;
+  padding-bottom:3.5rem;
+}
+
+/* Cards, buttons, pills */
+.card{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(16,24,40,.06);
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.8rem 1.1rem;
+  border-radius:10px;
+  font-weight:600;
+}
+
+.btn-primary{background:var(--brand) !important; color:#fff !important}
+.btn-ghost{border:1px solid var(--line); background:#fff; color:var(--brand)}
+
+.pill{
+  border:1px solid var(--line);
+  background:#fff;
+  padding:.45rem .9rem;
+  border-radius:999px;
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+/* Step number badge */
+.step-dot{
+  position:absolute;
+  top:-12px;
+  left:-12px;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  display:grid;
+  place-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+/* Nav links (for React version we use .nav-plain as well) */
+.navlink{
+  background:transparent;
+  color:var(--muted);
+  border:0;
+  padding:0;
+  border-radius:0;
+  box-shadow:none;
+  outline:none;
+  font:inherit;
+  cursor:pointer;
+}
+.navlink:hover{ color:var(--brand); }
+
+
+.section-wrap{
+  max-width:72rem;
+  margin:0 auto;
+  padding:0 1.25rem;
+}
+
+.services-grid{
+  margin-top:2rem;
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:1.25rem;
+}
+
+@media (max-width: 900px){
+  .services-grid{ grid-template-columns:1fr; }
+}
+
+/* ========================================================= */
+/* ==========    SERVICES HOVER CARDS (FINAL)      ========= */
+/* ========================================================= */
+
+/* Whole card */
+.service-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  box-shadow:0 6px 20px rgba(16,24,40,.06);
+  transition:transform .25s ease, box-shadow .25s ease;
+
+  /* FIXED HEIGHT → no layout shift across the row */
+  height:280px;
+}
+.service-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(16,24,40,.10);
+}
+
+/* Image container */
+.service-media{
+  position:relative;
+  width:100%;
+  height:100%;
+  background:#f3f4f6;
+}
+
+/* Main image */
+.service-image{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter:grayscale(100%);
+  transform:scale(1.02);
+  transition:filter .35s ease, transform .35s ease;
+}
+.service-card:hover .service-image{
+  filter:grayscale(0%);
+  transform:scale(1.06);
+}
+
+/* Title overlay on bottom of image */
+.service-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.35) 100%);
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-start;
+  padding:12px 14px;
+}
+.service-title{
+  color:#fff;
+  font-weight:700;
+  font-size:1.05rem;
+  text-shadow:0 1px 2px rgba(0,0,0,.4);
+  letter-spacing:.2px;
+}
+
+/* BULLET TEXT PANEL – slides INSIDE the photo */
+.service-body{
+  position:absolute;
+  left:0;
+  right:0;
+
+  /* leave room for the service title at the very bottom */
+  bottom:40px;
+
+  /* padding so the text starts higher and ends above the title */
+  padding:16px 16px 12px 16px;
+  background:rgba(15,23,42,.25);
+
+  /* Start hidden slightly below its final position */
+  transform:translateY(110%);
+  opacity:0;
+
+  transition:
+    transform .25s ease,
+    opacity .25s ease;
+}
+
+/* On hover, slide the panel UP */
+.service-card:hover .service-body{
+  transform:translateY(0);
+  opacity:1;
+}
+
+.service-body ul{
+  margin:0;
+  padding-left:18px;
+  color:#f9fafb;
+  font-size:.9rem;
+}
+
+/* Placeholder image fallback */
+.service-placeholder{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  color:#9ca3af;
+  font-size:.9rem;
+}
+
+/* ========================================================= */
+/* ==========    SCROLL REVEAL ANIMATIONS        ========== */
+/* ========================================================= */
+
+.reveal{
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .45s ease, transform .45s ease;
+}
+.reveal.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ========================================================= */
+/* ==========          LIGHTBOX CONTROLS          ========= */
+/* ========================================================= */
+
+.lightbox-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  padding:.5rem .75rem;
+  border-radius:999px;
+  color:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.12);
+}
+.lightbox-btn.left{ left:1rem; }
+.lightbox-btn.right{ right:1rem; }
+.lightbox-btn:hover{ background:rgba(255,255,255,.2); }
+
+.lightbox-close{
+  position:absolute;
+  right:1rem;
+  top:1rem;
+  padding:.35rem .65rem;
+  border-radius:999px;
+  color:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.12);
+}
+.lightbox-close:hover{ background:rgba(255,255,255,.2); }
+
+/* ============================================ */
+/* ========== HOME – full-width image rows ==== */
+/* ============================================ */
+
+.home-row {
+  position: relative;
+  margin-top: 2.75rem;
+  background: #ffffff;
+}
+
+.home-row-inner {
+  max-width: 72rem;        /* like max-w-6xl */
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+/* Image container */
+.home-row-media {
+  position: relative;
+  width: 100%;
+  height: 18rem;              /* smaller */
+  background-size: cover;
+  background-position: center;
+  border-radius: 14px;         /* rounded */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);  /* subtle depth */
+  overflow: hidden;
+}
+
+/* Gradient overlay that hides the far edge completely */
+.home-row-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* LEFT image → fade out to the RIGHT into pure white */
+.home-row-left .home-row-media::after {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0.7) 75%,
+    #ffffff 100%
+  );
+}
+
+/* RIGHT image → fade out to the LEFT into pure white */
+.home-row-right .home-row-media::after {
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0.7) 75%,
+    #ffffff 100%
+  );
+}
+
+/* Text block */
+.home-row-content {
+  max-width: 32rem;
+}
+
+/* Desktop layout: side-by-side and image pushed to page edge */
+@media (min-width: 1024px) {
+  .home-row-inner {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* Manufacturing & Digital: image on LEFT */
+  .home-row-left .home-row-media {
+  flex: 1.2;
+  margin-right: 1.75rem;
+  margin-left: 0;             /* no full-bleed */
+}
+  .home-row-left .home-row-content {
+    flex: 1;
+  }
+
+  /* Assembly: image on RIGHT */
+  .home-row-right .home-row-media {
+  flex: 1.2;
+  margin-left: 1.75rem;
+  margin-right: 0;            /* no full-bleed */
+  order: 2;
+}
+  .home-row-right .home-row-content {
+    flex: 1;
+    order: 1;
+  }
+}
+
+/* ------------------------- */
+/* NAVBAR – desktop + mobile */
+/* ------------------------- */
+
+/* Main navigation links – force horizontal layout */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+
+.site-header{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+
+  background-color: rgba(255,255,255,0.97);
+  backdrop-filter: blur(10px);
+
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+
+  /* needed for the pseudo shadow */
+  position: fixed;
+}
+
+.site-header::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-14px;              /* pushes the shadow below the bar */
+  height:14px;
+  pointer-events:none;
+  background: linear-gradient(
+    to bottom,
+    rgba(2,6,23,0.16),
+    rgba(2,6,23,0.00)
+  );
+}
+
+
+/* Outer container */
+.nav-inner {
+  max-width: 72rem;          /* like max-w-6xl */
+  margin: 0 auto;
+  padding: 0.55rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+/* Brand section */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav-brand-logo {
+  height: 40px;          /* stronger presence */
+  width: auto;
+  background: transparent; /* enforce transparency */
+  display: block;
+}
+
+.nav-brand-text {
+  line-height: 1.2;
+}
+
+.nav-brand-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+.nav-brand-tagline {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+/* Main menu */
+.nav-main {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+}
+
+/* Override generic navlink a bit */
+.navlink {
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  font: inherit;
+  cursor: pointer;
+  position: relative;
+}
+
+.navlink:hover {
+  color: var(--brand);
+}
+
+.navlink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.25rem;
+  height: 2px;
+  background: var(--brand);
+  opacity: 0;
+  transform: scaleX(0.4);
+  transform-origin: center;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.navlink:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* Smartphone / small tablet layout */
+@media (max-width: 768px) {
+  .nav-inner {
+    flex-direction: column;      /* stack brand + menu */
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .nav-main {
+    flex-wrap: wrap;
+    width: 100%;
+    row-gap: 0.25rem;
+    column-gap: 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .nav-brand-tagline {
+    white-space: normal;        /* allow wrapping on very small screens */
+  }
+}
+
+/* Final safety net: never allow horizontal scrolling  */
+body,
+#root,
+main {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+
+
+
+/* === OVERRIDE: service bullets only on hover (no layout change) === */
+
+/* hide bullets panel by default */
+.service-body{
+  opacity: 0 !important;
+  transform: translateY(110%) !important;
+  pointer-events: none !important;
+}
+
+/* show bullets panel only on hover */
+.service-card:hover .service-body{
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+/* keep title always visible (as you currently have it) */
+.service-overlay{
+  opacity: 1 !important;
+}
+
+
+/* === FIX: if bullets/text are inside .service-overlay (Link-based cards), hide them until hover === */
+
+/* Keep headings visible, hide details by default */
+.service-overlay p,
+.service-overlay ul{
+  opacity: 0;
+  transform: translateY(8px);
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity .25s ease, transform .25s ease, max-height .25s ease;
+}
+
+/* Show details only on hover */
+.service-card:hover .service-overlay p,
+.service-card:hover .service-overlay ul{
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 200px;
+}
+
+/* ========================================================= */
+/* ========== NAVBAR DROPDOWN (OVERLAY, NO LAYOUT SHIFT) ==== */
+/* ========================================================= */
+
+/* ensure header containers don't clip the dropdown */
+.site-header,
+.nav-inner,
+.nav-links {
+  overflow: visible !important;
+}
+
+/* anchor element for absolute dropdown */
+.services-dd {
+  position: relative !important;
+}
+
+/* dropdown panel must overlay (never affect layout) */
+.services-dd .dd-menu {
+  position: absolute !important;
+  top: calc(100% + 10px) !important;
+  left: 0 !important;
+
+  width: 340px !important;
+  background: #fff !important;
+
+  border: 1px solid var(--line) !important;
+  border-radius: 14px !important;
+
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.14) !important;
+  padding: 8px !important;
+
+  z-index: 9999 !important;
+}
+
+/* items */
+.services-dd .dd-item {
+  display: block !important;
+  padding: 10px 10px !important;
+  border-radius: 10px !important;
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+.services-dd .dd-item:hover {
+  background: rgba(0, 61, 165, 0.06) !important;
+  border: "1px solid rgba(0,61,165,0.18)",
+}
+
+.services-dd .dd-title {
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.2 !important;
+}
+
+.services-dd .dd-sub {
+  margin-top: 2px !important;
+  color: var(--muted) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.25 !important;
+}
+/* Sticky navbar “settles” after scroll */
+.site-header--scrolled{
+  box-shadow: 0 10px 24px rgba(2,6,23,0.10);
+  border-bottom-color: rgba(229,231,235,0.85);
+}
+
+/* Prevent content from hiding behind fixed navbar */
+main {
+  padding-top: 74px; /* adjust if your navbar is taller/shorter */
+}
+
+/* ===== FIX: remove any seam under fixed navbar ===== */
+.site-header{
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Make the area behind the fixed navbar padding match the hero band */
+main{
+  background: var(--hero-band);
+}
+/* Fix gap under fixed navbar: blend padding into hero band */
+main {
+  background: var(--hero-band);
+}
+
+/* ===== FORCE scroll-reveal to work (override-proof) ===== */
+.reveal {
+  opacity: 0 !important;
+  transform: translateY(14px) !important;
+  transition: opacity 0.6s ease, transform 0.6s ease !important;
+  will-change: opacity, transform;
+}
+
+.reveal.visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* ===== FIX: prevent nested scrolling (double scrollbar) ===== */
+html, body {
+  height: auto !important;
+  overflow-y: auto !important;
+}
+
+#root {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+main {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.site-footer {
+  background: #ffffff;
+  border-top: 1px solid #e6e9ef;
+  padding: 28px 0;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 80px;
+  align-items: flex-start;
+}
+
+.footer-col {
+  font-size: 14px;
+  line-height: 22px;
+  color: #4b5563; /* body text grey */
+}
+
+.footer-title {
+  font-weight: 600;
+  color: #111827; /* ⬅️ solid black */
+  margin-bottom: 0px;
+}
+
+.footer-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.footer-link {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+.footer-nowrap {
+  white-space: nowrap; /* ✅ prevents email split */
+}
+
+.footer-col-right {
+  text-align: right;
+}
+
+.footer-legal {
+  line-height: 22px;  /* ✅ matches other lines exactly */
+}
+
+.footer-copyright {
+  margin-top: 0px;
+  font-size: 13px;
+  line-height: 22px;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .footer-inner {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .footer-col-right {
+    text-align: left;
+  }
+}
+
+
+/* ===== Services dropdown hover stability ===== */
+
+.services-dd {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* keep menu in DOM but hidden */
+.services-dd .dd-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 320px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+  z-index: 9999;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity .12s ease, transform .12s ease, visibility .12s ease;
+  pointer-events: none; /* so it doesn't block when hidden */
+}
+
+/* show on hover OR when JS open */
+.services-dd:hover .dd-menu,
+.services-dd.is-open .dd-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* invisible hover bridge to kill the "gap" issue */
+.services-dd .dd-menu::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: -10px;
+  right: -10px;
+  height: 12px;
+}
+
+/* optional: make items feel clickable */
+.dd-item {
+  display: block;
+}
+
+/* ===== Warum Volotech – card contrast ===== */
+
+.why-card {
+  background: #f5f8ff;          /* light brand blue */
+  border: 1px solid #dbe4ff;
+  border-radius: 16px;          /* keep your existing rounding */
+  box-shadow: none;
+}
+
+/* optional but recommended: subtle hover lift */
+.why-card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.15s ease;
+}
+
