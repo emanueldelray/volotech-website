@@ -9,6 +9,8 @@ import ManufacturingPage from "./pages/ManufacturingPage";
 import AssemblyPage from "./pages/AssemblyPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import AboutPage from "./pages/AboutPage";
+import ImpressumPage from "./pages/ImpressumPage";
+import DatenschutzPage from "./pages/DatenschutzPage";
 
 /* ===== Scroll reveal observer ===== */
 function ScrollRevealManager() {
@@ -76,8 +78,8 @@ export default function App() {
           <Route path="/about" element={<AboutPage lang={lang} />} />
           <Route path="/ce" element={<CePage lang={lang} />} />
           <Route path="/assembly" element={<AssemblyPage lang={lang} />} />
-          <Route path="/impressum" element={<Placeholder title="Impressum" lang={lang} />} />
-          <Route path="/datenschutz" element={<Placeholder title="Datenschutz" lang={lang} />} />
+         <Route path="/impressum" element={<ImpressumPage lang={lang} />} />
+          <Route path="/datenschutz" element={<DatenschutzPage lang={lang} />} />
           <Route path="*" element={<Placeholder title={lang === "de" ? "Seite nicht gefunden" : "Page not found"} lang={lang} />} />
         </Routes>
       </main>
