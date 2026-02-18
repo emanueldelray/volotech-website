@@ -18,6 +18,7 @@ export default function DatenschutzPage({ lang = "de" }) {
         </p>
         <p>Emanuel Chitic</p>
         <p>Volotech</p>
+        <p>Staudeweg 6</p>
         <p>86368 Gersthofen, {isDe ? "Deutschland" : "Germany"}</p>
         <p>
           E-Mail:{" "}
