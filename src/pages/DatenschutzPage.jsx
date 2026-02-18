@@ -113,7 +113,7 @@ export default function DatenschutzPage({ lang = "de" }) {
       <Section title={isDe ? "8. SSL-/TLS-Verschlüsselung" : "8. SSL/TLS encryption"}>
         <p style={prose}>
           {isDe
-            ? "Diese Seite nutzt aus Sicherheitsgründen eine SSL- bzw. TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers von „http://" auf „https://" wechselt und an dem Schloss-Symbol in Ihrer Browserzeile."
+            ? "Diese Seite nutzt aus Sicherheitsgründen eine SSL- bzw. TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers von "http://" auf "https://" wechselt und an dem Schloss-Symbol in Ihrer Browserzeile."
             : "For security reasons, this site uses SSL/TLS encryption. You can recognize an encrypted connection by the browser's address bar changing from \"http://\" to \"https://\" and by the lock icon in your browser bar."}
         </p>
       </Section>
