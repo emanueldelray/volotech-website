@@ -50,8 +50,8 @@ export default function ManufacturingPage({ lang = "de" }) {
             </h1>
             <p style={{ marginTop: "0.75rem", color: "var(--muted)", lineHeight: 1.65, fontSize: "1.02rem" }}>
               {isDe
-                ? "Volotech koordiniert die Fertigung bearbeiteter und gefertigter Teile aus Aluminium, Stählen, Edelstahl, Messing und technischen Kunststoffen. Schwerpunkt: Komponenten für Automatisierung, Maschinenbau, Vorrichtungen und Industriehardware. Einzelteile und Prototypen genauso wie wiederkehrende Serienteile."
-                : "Volotech coordinates the manufacturing of machined and fabricated parts in aluminium, steels, stainless, brass, and technical plastics. Focus: components for automation, machine building, fixtures, and industrial hardware. One-offs and prototypes as well as recurring series parts."}
+                ? "Volotech koordiniert die Fertigung bearbeiteter und gefertigter Teile aus Aluminium, Stählen, Edelstahl, Messing, Kupfer und technischen Kunststoffen. Schwerpunkt: Komponenten für Automatisierung, Maschinenbau, Vorrichtungen und Industriehardware. Einzelteile und Prototypen genauso wie wiederkehrende Serienteile."
+                : "Volotech coordinates the manufacturing of machined and fabricated parts in aluminium, steels, stainless, brass, copper, and technical plastics. Focus: components for automation, machine building, fixtures, and industrial hardware. One-offs and prototypes as well as recurring series parts."}
             </p>
 
             {/* Tiles */}
@@ -60,22 +60,22 @@ export default function ManufacturingPage({ lang = "de" }) {
                 img={serviceImages.turning}
                 title={isDe ? "CNC-Bearbeitung" : "CNC machining"}
                 desc={isDe
-                  ? "3- und 5-Achs-Fräsen + CNC-Drehen. Stahl, Edelstahl, Aluminium, Messing, Kunststoffe. Typische Toleranz ±0,02 mm."
-                  : "3- and 5-axis milling + CNC turning. Steel, stainless, aluminium, brass, plastics. Typical tolerance ±0.02 mm."}
+                  ? "3- bis 5-Achs-Fräsen + CNC-Drehen (bis 8 Achsen). Stahl, Edelstahl, Aluminium, Messing, Kupfer, Kunststoffe. Typische Toleranz ±0,02 mm."
+                  : "3- to 5-axis milling + CNC turning (up to 8 axes). Steel, stainless, aluminium, brass, copper, plastics. Typical tolerance ±0.02 mm."}
               />
               <MfgTile
                 img={serviceImages.sheet}
                 title={isDe ? "Blechbearbeitung" : "Sheet metal"}
                 desc={isDe
-                  ? "Laserschneiden, Stanzen, Biegen. Stahl, Edelstahl, Aluminium. Halter, Abdeckungen, Gehäuse, Montageplatten."
-                  : "Laser cutting, punching, bending. Steel, stainless, aluminium. Brackets, covers, housings, mounting plates."}
+                  ? "Laserschneiden, Abkanten, Wasserstrahlschneiden. Stahl, Edelstahl, Aluminium. Halter, Abdeckungen, Gehäuse, Montageplatten."
+                  : "Laser cutting, bending, water jet cutting. Steel, stainless, aluminium. Brackets, covers, housings, mounting plates."}
               />
               <MfgTile
                 img={serviceImages.welding}
                 title={isDe ? "Schweißen & Strukturen" : "Welding & structures"}
                 desc={isDe
-                  ? "WIG/MAG-Schweißen. Halter, Rahmen, Vorrichtungen. Nachbearbeitung (Planflächen, Bohrungen) auf Anfrage."
-                  : "TIG/MIG welding. Brackets, frames, fixtures. Post-weld machining (faces, holes) on request."}
+                  ? "MIG-, MMA- und WIG-Schweißen. Halter, Rahmen, Vorrichtungen. Nachbearbeitung (Planflächen, Bohrungen) auf Anfrage."
+                  : "MIG, MMA and TIG welding. Brackets, frames, fixtures. Post-weld machining (faces, holes) on request."}
               />
             </div>
           </div>
@@ -93,12 +93,15 @@ export default function ManufacturingPage({ lang = "de" }) {
           />
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "1rem" }} className="grid-3">
-            <TechCard kicker={isDe ? "CNC-Fräsen" : "CNC milling"} title={isDe ? "3- bis 5-Achs, bis ca. 800 × 500 × 400 mm" : "3- to 5-axis, up to approx. 800 × 500 × 400 mm"} />
-            <TechCard kicker={isDe ? "CNC-Drehen" : "CNC turning"} title={isDe ? "Bis Ø 300 mm, Länge bis 500 mm" : "Up to Ø 300 mm, length up to 500 mm"} />
+            <TechCard kicker={isDe ? "CNC-Fräsen" : "CNC milling"} title={isDe ? "3- bis 5-Achs, bis ca. 1.700 × 700 × 500 mm" : "3- to 5-axis, up to approx. 1,700 × 700 × 500 mm"} />
+            <TechCard kicker={isDe ? "CNC-Drehen" : "CNC turning"} title={isDe ? "2- bis 8-Achs, bis Ø 320 mm, Länge bis 1.200 mm" : "2- to 8-axis, up to Ø 320 mm, length up to 1,200 mm"} />
+            <TechCard kicker={isDe ? "Drahterodieren" : "Wire EDM"} title={isDe ? "Max. Werkstück 600–800 mm, Z-Achse 400 mm" : "Max. workpiece 600–800 mm, Z-axis 400 mm"} />
             <TechCard kicker={isDe ? "Toleranzen" : "Tolerances"} title={isDe ? "Typisch ±0,02 mm (bis 0,01 mm nach Rücksprache)" : "Typical ±0.02 mm (down to 0.01 mm on request)"} />
             <TechCard kicker={isDe ? "Blechdicke" : "Sheet thickness"} title={isDe ? "1–10 mm Stahl/Edelstahl, 1–8 mm Aluminium" : "1–10 mm steel/stainless, 1–8 mm aluminium"} />
-            <TechCard kicker={isDe ? "Schweißen" : "Welding"} title={isDe ? "WIG/MAG — Stahl, Edelstahl, Aluminium" : "TIG/MIG — steel, stainless, aluminium"} />
-            <TechCard kicker={isDe ? "Oberflächen" : "Finishes"} title={isDe ? "Eloxal, Verzinken, Pulver, Strahlen (über Partner)" : "Anodizing, zinc, powder coat, blasting (via partners)"} />
+            <TechCard kicker={isDe ? "Schweißen" : "Welding"} title={isDe ? "MIG, MMA, WIG — Stahl, Edelstahl, Aluminium" : "MIG, MMA, TIG — steel, stainless, aluminium"} />
+            <TechCard kicker={isDe ? "Oberflächen" : "Finishes"} title={isDe ? "Eloxal, Galvanisierung, Wärmebehandlung, Lackierung" : "Anodizing, galvanizing, heat treatment, painting"} />
+            <TechCard kicker={isDe ? "Werkstoffe" : "Materials"} title={isDe ? "Stahl, Edelstahl, Alu, Kupfer, Messing, POM, PA, PEEK, PTFE" : "Steel, stainless, alu, copper, brass, POM, PA, PEEK, PTFE"} />
+            <TechCard kicker={isDe ? "Wasserstrahlschneiden" : "Water jet cutting"} title={isDe ? "Für komplexe Konturen und wärmeempfindliche Materialien" : "For complex contours and heat-sensitive materials"} />
           </div>
         </div>
       </section>
