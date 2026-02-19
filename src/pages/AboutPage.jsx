@@ -46,7 +46,7 @@ export default function AboutPage({ lang = "de" }) {
               <p style={{ color: "var(--muted)", lineHeight: 1.7 }}>
                 {isDe
                   ? "Maschinenbauingenieur mit über 10 Jahren Berufserfahrung in Deutschland. Aktuelle Tätigkeit: Fachexperte für die mechanische Standardisierung von Anlagen bei einem deutschen Automobilhersteller. Davor: Projektleitung und Baustellenleitung in der Intralogistik und Fördertechnik."
-                  : "Mechanical engineer with over 10 years of professional experience in Germany. Current role: Subject Matter Expert in mechanical standardization of equipment at a German automotive OEM. Previously: project management and site management in intralogistics and conveyor systems."}
+                  : "Mechanical engineer with over 10 years of professional experience in Germany. Current role: specialist for mechanical standardization of equipment at a German automotive OEM. Previously: project management and site management in intralogistics and conveyor systems."}
               </p>
             </div>
 
@@ -132,23 +132,23 @@ export default function AboutPage({ lang = "de" }) {
         </div>
       </section>
 
-      {/* ===== CTA ===== */}
-      <section style={{ background: "var(--bg)", borderTop: "1px solid var(--line)" }}>
+      {/* ===== CTA (dark) ===== */}
+      <section style={{ background: "var(--brand)", color: "#fff" }}>
         <div className="section-wrap">
-          <div className="v-card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1.5rem", flexWrap: "wrap" }}>
             <div style={{ maxWidth: "48rem" }}>
-              <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>
+              <h2 style={{ fontSize: "1.35rem", fontWeight: 700, color: "#fff", margin: 0 }}>
                 {isDe ? "Passt das zu Ihrem Projekt?" : "Does this fit your project?"}
-              </div>
-              <p style={{ marginTop: "0.35rem", color: "var(--muted)", lineHeight: 1.6 }}>
+              </h2>
+              <p style={{ marginTop: "0.5rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>
                 {isDe
                   ? "Senden Sie eine kurze Anfrage mit Zeichnung und Eckdaten — wir melden uns strukturiert zurück."
                   : "Send a short request with a drawing and key data — we'll respond with structured next steps."}
               </p>
             </div>
-            <CTAButton to="/manufacturing?rfq=1">
+            <a href="/manufacturing?rfq=1" className="btn-primary" style={{ textDecoration: "none", background: "#fff", color: "var(--brand)", fontWeight: 700, whiteSpace: "nowrap" }}>
               {isDe ? "Anfrage stellen" : "Request a quote"}
-            </CTAButton>
+            </a>
           </div>
         </div>
       </section>
