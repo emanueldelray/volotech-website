@@ -45,8 +45,8 @@ export default function AboutPage({ lang = "de" }) {
               </div>
               <p style={{ color: "var(--muted)", lineHeight: 1.7 }}>
                 {isDe
-                  ? "Maschinenbauingenieur mit über 10 Jahren Berufserfahrung in Deutschland. Aktuelle Tätigkeit: Subject Matter Expert in der mechanischen Standardisierung bei einem deutschen Automobilhersteller (OEM). Davor: Projektleitung und Baustellenleitung in der Intralogistik und Fördertechnik."
-                  : "Mechanical engineer with over 10 years of professional experience in Germany. Current role: Subject Matter Expert in mechanical standardization at a German automotive OEM. Previously: project management and site management in intralogistics and conveyor systems."}
+                  ? "Maschinenbauingenieur mit über 10 Jahren Berufserfahrung in Deutschland. Aktuelle Tätigkeit: Fachexperte für die mechanische Standardisierung von Anlagen bei einem deutschen Automobilhersteller. Davor: Projektleitung und Baustellenleitung in der Intralogistik und Fördertechnik."
+                  : "Mechanical engineer with over 10 years of professional experience in Germany. Current role: Subject Matter Expert in mechanical standardization of equipment at a German automotive OEM. Previously: project management and site management in intralogistics and conveyor systems."}
               </p>
             </div>
 
