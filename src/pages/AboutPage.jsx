@@ -59,8 +59,8 @@ export default function AboutPage({ lang = "de" }) {
                 <li>{isDe ? "Baustellenleitung — Intralogistik & Fördertechnik" : "Site management — Intralogistics & conveyor systems"}</li>
                 <li>{isDe ? "Projektleitung — Hängefördersysteme" : "Project management — Overhead conveyor systems"}</li>
                 <li>{isDe ? "Mechanische Montage — Fördertechnik & Automatisierung" : "Mechanical fitting — Conveyor systems & automation"}</li>
-                <li>MBA</li>
                 <li>{isDe ? "Studium Maschinenbau (B.Eng.)" : "B.Eng. Mechanical Engineering"}</li>
+                <li>MBA</li>
               </ul>
             </div>
           </div>
