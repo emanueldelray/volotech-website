@@ -32,7 +32,7 @@ img { max-width: 100%; height: auto; display: block; }
   --subtle: #6b7280;
   --line: #d1d5db;
   --line-strong: #9ca3af;
-  --bg: #ffffff;
+  --bg: #f7f8fa;
   --bg-alt: #f7f8fa;
 
   /* Shadows */
@@ -683,4 +683,16 @@ html, body { height: auto; overflow-y: auto; }
   transform: translateY(-2px);
   border-color: var(--accent);
   box-shadow: var(--shadow-md);
+}
+
+/* ========================================================= */
+/* ===  BRAND ACCENT STRIPES — top & bottom               === */
+/* ========================================================= */
+
+section:first-of-type {
+  border-top: 4px solid var(--brand);
+}
+
+section:last-of-type {
+  border-bottom: 4px solid var(--brand);
 }
