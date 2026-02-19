@@ -45,8 +45,8 @@ export default function AboutPage({ lang = "de" }) {
               </div>
               <p style={{ color: "var(--muted)", lineHeight: 1.7 }}>
                 {isDe
-                  ? "Maschinenbauingenieur mit über 10 Jahren Berufserfahrung in Deutschland. Aktuelle Tätigkeit: Subject Matter Expert in der mechanischen Standardisierung bei einem deutschen Automobilhersteller (OEM). Davor: Projektleitung und Baustellenleitung in der Intralogistik und Fördertechnik. MBA-Abschluss an einer Triple-Crown-akkreditierten Business School."
-                  : "Mechanical engineer with over 10 years of professional experience in Germany. Current role: Subject Matter Expert in mechanical standardization at a German automotive OEM. Previously: project management and site management in intralogistics and conveyor systems. MBA from a Triple Crown-accredited business school."}
+                  ? "Maschinenbauingenieur mit über 10 Jahren Berufserfahrung in Deutschland. Aktuelle Tätigkeit: Subject Matter Expert in der mechanischen Standardisierung bei einem deutschen Automobilhersteller (OEM). Davor: Projektleitung und Baustellenleitung in der Intralogistik und Fördertechnik."
+                  : "Mechanical engineer with over 10 years of professional experience in Germany. Current role: Subject Matter Expert in mechanical standardization at a German automotive OEM. Previously: project management and site management in intralogistics and conveyor systems."}
               </p>
             </div>
 
@@ -59,7 +59,7 @@ export default function AboutPage({ lang = "de" }) {
                 <li>{isDe ? "Baustellenleitung — Intralogistik & Fördertechnik" : "Site management — Intralogistics & conveyor systems"}</li>
                 <li>{isDe ? "Projektleitung — Hängefördersysteme" : "Project management — Overhead conveyor systems"}</li>
                 <li>{isDe ? "Mechanische Montage — Fördertechnik & Automatisierung" : "Mechanical fitting — Conveyor systems & automation"}</li>
-                <li>MBA — Triple Crown (AACSB, EQUIS, AMBA)</li>
+                <li>MBA</li>
                 <li>{isDe ? "Studium Maschinenbau (B.Eng.)" : "B.Eng. Mechanical Engineering"}</li>
               </ul>
             </div>
