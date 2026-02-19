@@ -41,7 +41,7 @@ export default function AboutPage({ lang = "de" }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }} className="grid-2">
             <div className="v-card">
               <div style={{ fontWeight: 700, marginBottom: "0.75rem", color: "var(--ink)" }}>
-                Emanuel Chitic, M.Eng., MBA
+                Emanuel Chitic, B.Eng., MBA
               </div>
               <p style={{ color: "var(--muted)", lineHeight: 1.7 }}>
                 {isDe
