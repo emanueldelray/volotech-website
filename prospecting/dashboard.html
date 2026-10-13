@@ -149,6 +149,11 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     <div class="grp" id="f-risk"><span>Payment risk</span></div>
     <div class="grp" id="f-status"><span>Status</span></div>
     <input id="q" class="search" type="search" placeholder="Search company, region, person" aria-label="Search">
+    <div class="grp" id="static-tools" hidden>
+      <button class="chip" id="export-notes" type="button">Export notes</button>
+      <label class="chip" for="import-notes">Import notes</label>
+      <input id="import-notes" type="file" accept="application/json" hidden>
+    </div>
   </div>
 
   <div class="main">
@@ -360,12 +365,24 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
       </div>`).join("")}</details>`;
   }
 
+  // Standalone build: research data is embedded as window.PROSPECT_DATA, and status/notes live in this browser.
+  const STATIC = !!window.PROSPECT_DATA;
+  const LS_KEY = "volotech-prospect-status";
+  function lsRead(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch { return {}; } }
+  function lsWrite(v){ try { localStorage.setItem(LS_KEY, JSON.stringify(v)); return true; } catch { return false; } }
+
   let saving = false;
   async function saveStatus(id, patch){
-    if (!db || saving) return;
+    if ((!db && !STATIC) || saving) return;
     saving = true;
     const cur = state.status[id] || {};
     const next = { state: cur.state || "new", note: cur.note || "", ...patch, updated: new Date().toISOString() };
+    if (STATIC){
+      state.status = { ...state.status, [id]: next };
+      if (!lsWrite(state.status)) { const m = $("#note-msg"); if (m) m.textContent = "This browser blocks local storage, so notes are not kept."; }
+      renderList(); renderDossier();
+      saving = false; return;
+    }
     try { await db.doc("status/" + id).set(next); }
     catch (e) {
       const m = $("#note-msg"); if (m) m.textContent = e && e.code === "invalid_argument" ? "You can view this page but not change it." : "Not saved. Try again in a moment.";
@@ -375,6 +392,30 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   }
 
   renderKpis(); renderList(); renderDossier();
+
+  if (STATIC){
+    const D = window.PROSPECT_DATA;
+    state.prospects = D.prospects || []; state.screening = D.screening || []; state.runs = D.runs || [];
+    state.status = { ...(D.status || {}), ...lsRead() };
+    const h = (location.hash||"").slice(1);
+    state.sel = state.prospects.some(p=>p.id===h) ? h : (visible()[0]?.id ?? null);
+    renderKpis(); renderList(); renderDossier(); renderScreened();
+    $("#notice").textContent = `Snapshot exported ${D.exported_at || ""}. Status and notes are saved in this browser only; use Export notes to move them to another device.`;
+    const tools = $("#static-tools"); tools.hidden = false;
+    $("#export-notes").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(state.status, null, 2)], {type: "application/json"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = "volotech-prospect-notes-" + new Date().toISOString().slice(0,10) + ".json"; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+    $("#import-notes").addEventListener("change", async e => {
+      const f = e.target.files[0]; if (!f) return;
+      try { const v = JSON.parse(await f.text()); state.status = { ...state.status, ...v }; lsWrite(state.status); renderList(); renderDossier(); $("#notice").textContent = "Notes imported."; }
+      catch { $("#notice").textContent = "That file is not a notes export from this dashboard."; }
+      e.target.value = "";
+    });
+    return;
+  }
 
   (async () => {
     db = await (window.claude?.use ? window.claude.use("db") : null);

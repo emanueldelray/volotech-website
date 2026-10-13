@@ -36,3 +36,15 @@ The cloud environment needs **Full** network access (set in a browser at claude.
 - **B**: good fit, no current trigger; nurture and follow up
 - **C**: weak fit (own CNC, wrong part spectrum); only a narrow angle
 - **X**: do not contact (insolvent, closed, competitor)
+
+## Standalone copy (outside claude.ai)
+
+`build_standalone.py` turns `dashboard.html` plus a read-back of the artifact database into one self-contained HTML file with the research data embedded:
+
+```
+python3 prospecting/build_standalone.py <export_dir> volotech-prospect-radar.html
+```
+
+`<export_dir>` holds one folder per collection (`prospects/`, `screening/`, `runs/`, `status/`) with `<doc_id>.json` files. Claude produces it with an `ArtifactData` list per collection (`out_dir`). In the standalone file, status and notes are saved in the browser (localStorage); **Export notes / Import notes** moves them between devices.
+
+The file contains names, emails and phone numbers of real people. It is gitignored (`prospect-radar*.html`). Open it locally, or host it only behind a login (e.g. Vercel project with password protection or a basic-auth middleware, Cloudflare Access, a NAS on your network). Never put it in `public/` of the website.
