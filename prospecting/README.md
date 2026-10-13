@@ -9,10 +9,13 @@ Internal tooling for finding which CRM prospects need external CNC / sheet-metal
 
 ## Files
 
-- `research-brief.md`: the instructions each research agent follows (what to look for, how to rate fit, timing and payment risk, the JSON output shape).
+- `screen-brief.md`: stage 1, a quick screen of many companies (still operating? own CNC? part need?), verdict deep / maybe / drop.
+- `research-brief.md`: stage 2, the full research each agent runs on companies that passed the screen (signals, fit, part profile, payment risk, contacts, email draft).
+- `fetch.py`: reads a web page as plain text through curl. WebFetch cannot resolve hostnames in the cloud environment, so agents use this via Bash. Copy it to the session scratchpad and point the briefs at it.
 - `dashboard.html`: source of the dashboard artifact. It reads three collections from the artifact database:
   - `prospects/<id>`: one research result per company (`id` = `p` + CRM row number, e.g. `p05`)
   - `status/<id>`: your status and notes per company, written from the dashboard
+  - `screening/<id>`: stage-1 screen result per company (shown under "Screened, not researched")
   - `runs/<batch>`: one entry per research batch
 
 ## Running a batch
@@ -20,10 +23,12 @@ Internal tooling for finding which CRM prospects need external CNC / sheet-metal
 Ask Claude in a Claude Code session: "Run the next prospect research batch: CRM rows 11–20". Claude then:
 
 1. Reads the CRM rows from Google Drive and skips rows marked as not qualified or already researched.
-2. Runs one research agent per company with `research-brief.md`.
-3. Writes each result to `prospects/<id>` and a `runs/<batch>` entry. Status and notes you set in the dashboard are never overwritten.
+2. Stage 1: screens 10–15 companies with `screen-brief.md` (a few agents, each handling several companies) and writes `screening/<id>`.
+3. Stage 2: runs one agent per "deep" company with `research-brief.md` and writes `prospects/<id>` plus a `runs/<batch>` entry. Status and notes you set in the dashboard are never overwritten.
 
-Research quality depends on the cloud environment's network access: with the default limited policy, agents can only see search snippets, not company websites, Northdata or the Bundesanzeiger.
+Web searches are capped at about 200 per turn across all agents, so a batch reads pages with `fetch.py` wherever it can and keeps searches to a minimum. northdata.de rate-limits (HTTP 429); the Bundesanzeiger shows documents only behind a CAPTCHA.
+
+The cloud environment needs **Full** network access (set in a browser at claude.ai/code, environment settings). With the default Limited policy agents only see search snippets.
 
 ## Priority scale
 
