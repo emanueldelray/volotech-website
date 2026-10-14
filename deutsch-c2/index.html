@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Deutsch C2</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="#/" class="brand">Deutsch&nbsp;C2</a>
+    <nav id="nav" class="nav" aria-label="Hauptnavigation"></nav>
+  </header>
+
+  <main id="main" class="main" tabindex="-1"></main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p class="main">Diese App benötigt JavaScript.</p></noscript>
+
+  <!-- Inhalte (eine Datei pro Modul) -->
+  <script src="content/grammatik.js"></script>
+
+  <!-- Kern -->
+  <script src="js/util.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/srs.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/ui.js"></script>
+
+  <!-- Ansichten und Module -->
+  <script src="js/dashboard.js"></script>
+  <script src="js/wiederholung.js"></script>
+  <script src="js/daten.js"></script>
+  <script src="js/grammatik.js"></script>
+
+  <script>APP.start();</script>
+</body>
+</html>
