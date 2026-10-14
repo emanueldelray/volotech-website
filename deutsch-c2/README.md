@@ -8,7 +8,7 @@ Lokale Lern-App ohne Framework, Build-Schritt oder Backend. Öffnen Sie einfach
 | Phase | Inhalt | Status |
 |---|---|---|
 | 1 | App-Shell, Dashboard, Fokus/Beherrschung, Wiederholung (SM-2), Sicherung, **Grammatik** | ✅ |
-| 2 | Wortschatz mit Spaced Repetition | – |
+| 2 | **Wortschatz** mit Spaced Repetition, Karteneditor | ✅ |
 | 3 | Schreiben (Claude-Brücke, Fehlerstatistik) | – |
 | 4 | Lesen, Hören, Inhalte importieren | – |
 
@@ -18,6 +18,7 @@ Lokale Lern-App ohne Framework, Build-Schritt oder Backend. Öffnen Sie einfach
 index.html
 css/app.css
 content/grammatik.js     Inhalte (window.DATA.grammatik) – hier ergänzen
+content/wortschatz.js    Decks und Karten (window.DATA.wortschatz)
 js/util.js               Hilfsfunktionen, Antwortvergleich
 js/store.js              localStorage, Export/Import
 js/srs.js                SM-2-Algorithmus
@@ -29,6 +30,7 @@ js/dashboard.js          Startseite
 js/wiederholung.js       täglicher Wartungsblock
 js/daten.js              Sicherung & Einstellungen
 js/grammatik.js          Modul Grammatik
+js/wortschatz.js         Modul Wortschatz (Karteikarten, Editor)
 ```
 
 Neue Inhalte: in `content/<modul>.js` eintragen – an der Logik muss nichts geändert
@@ -45,6 +47,10 @@ werden. Schema: siehe [SCHEMAS.md](SCHEMAS.md).
   (gemessen an der tatsächlich verbrachten Zeit, einstellbar).
 - **Zeiterfassung:** aktive Zeit pro Modul und Tag (Pause nach 90 s ohne Eingabe
   oder bei verstecktem Tab).
+- **Wortschatz:** Decks sind die Themen. Während ein Deck gelernt wird, laufen
+  seine fälligen Karten im Modul selbst (Lernstapel, max. 20 neue Lernkarten/Tag,
+  einstellbar). Ist das Deck beherrscht, erscheinen seine fälligen Karten im
+  täglichen Wartungsblock. Tastatur: Leertaste/Enter = aufdecken, 1–4 = bewerten.
 - **Serie:** aufeinanderfolgende Tage mit mindestens 1 Minute Lernzeit.
 
 ## Daten

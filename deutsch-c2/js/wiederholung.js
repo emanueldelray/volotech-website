@@ -60,8 +60,8 @@
       U.clear(stage);
       stage.appendChild(h('div', { class: 'counter muted small' }, mod.title + ' · ' + (done + 1) + '. Karte'));
       stage.appendChild(wrap);
-      mod.review.render(wrap, key.slice(p + 1), function (ok) {
-        APP.progress.reviewCard(key, ok ? 4 : 1);
+      mod.review.render(wrap, key.slice(p + 1), function (ok, quality) {
+        APP.progress.reviewCard(key, quality !== undefined ? quality : ok ? 4 : 1);
         done++;
         if (ok) correct++;
         next();

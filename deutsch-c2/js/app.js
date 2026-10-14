@@ -22,8 +22,11 @@
    *   topics()          → [{ id, title, description }]
    *   items(topicId)    → Items eines Themas
    *   getItem(itemId)   → einzelnes Item oder null
+   *   topicOf(itemId)   → Thema eines Items (für den Wartungsblock) oder null
+   *   focusInfo()       → optional: Kurzinfo für die Fokuskarte
+   *   enqueueOnMastery  → false, wenn das Modul seine SRS-Karten selbst anlegt
    *   render(el, params)→ Modulansicht (#/<id>/...)
-   *   review: { estimateSec, render(el, itemId, done(correct)) }  → für die Wiederholung
+   *   review: { estimateSec, render(el, itemId, done(correct, quality?)) }  → für die Wiederholung
    */
   APP.registerModule = function (mod) { APP.modules[mod.id] = mod; };
   APP.registerView = function (name, fn) { APP.views[name] = fn; };

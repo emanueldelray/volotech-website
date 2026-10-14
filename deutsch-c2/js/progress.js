@@ -58,7 +58,8 @@
   /** Items eines beherrschten Themas in die SRS-Schlange legen (gestaffelt ab morgen). */
   function enqueueTopic(moduleId, topicId) {
     var mod = APP.modules[moduleId];
-    if (!mod) return;
+    // Module mit eigenem Lernstapel (Wortschatz) planen ihre Karten selbst
+    if (!mod || mod.enqueueOnMastery === false) return;
     var tomorrow = U.addDays(U.dayStr(), 1);
     mod.items(topicId).forEach(function (item, idx) {
       var key = moduleId + ':' + item.id;
@@ -74,13 +75,19 @@
     });
   }
 
-  /** Fällige Karten, älteste zuerst. Nur Karten, deren Modul geladen ist. */
+  /**
+   * Fällige Karten für den Wartungsblock, älteste zuerst: nur Karten
+   * geladener Module, deren Thema bereits beherrscht ist.
+   */
   function dueCards() {
     var today = U.dayStr();
     return Object.keys(S().srs)
       .filter(function (k) {
         var m = k.slice(0, k.indexOf(':'));
-        return APP.modules[m] && APP.srs.isDue(S().srs[k], today) && APP.modules[m].getItem(k.slice(m.length + 1));
+        var mod = APP.modules[m];
+        if (!mod || !APP.srs.isDue(S().srs[k], today)) return false;
+        var topic = mod.topicOf(k.slice(m.length + 1));
+        return topic !== null && isMastered(m, topic);
       })
       .sort(function (a, b) { return S().srs[a].due < S().srs[b].due ? -1 : 1; });
   }

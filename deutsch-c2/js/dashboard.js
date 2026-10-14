@@ -72,7 +72,8 @@
     var rec = recommendedTopic(mod);
     var topicsAll = mod.topics();
     var mastered = topicsAll.filter(function (t) { return APP.progress.isMastered(mod.id, t.id); }).length;
-    card.appendChild(h('p', { class: 'muted small' }, mastered + ' von ' + topicsAll.length + ' Themen beherrscht'));
+    card.appendChild(h('p', { class: 'muted small' }, mastered + ' von ' + topicsAll.length + ' Themen beherrscht' +
+      (mod.focusInfo ? ' · ' + mod.focusInfo() : '')));
 
     if (rec) {
       card.appendChild(h('div', { class: 'actions' },

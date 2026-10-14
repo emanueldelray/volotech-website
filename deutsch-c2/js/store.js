@@ -15,7 +15,8 @@
         focus: 'grammatik',
         maintenanceMinutes: 10,
         focusTarget: 0.7,
-        sessionSize: 10
+        sessionSize: 10,
+        vocabNewPerDay: 20
       },
       // Antwortprotokoll: { m: Modul, t: Thema, i: Item-ID, c: 1/0, d: Tag, ts, r: 1 = Wiederholung }
       attempts: [],

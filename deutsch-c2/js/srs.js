@@ -20,9 +20,12 @@
       c.lapses = (c.lapses || 0) + 1;
     } else {
       c.reps += 1;
-      if (c.reps === 1) c.interval = 1;
-      else if (c.reps === 2) c.interval = 6;
-      else c.interval = Math.round(c.interval * c.ef);
+      if (c.reps === 1) c.interval = quality >= 5 ? 4 : 1;
+      else if (c.reps === 2) c.interval = quality === 3 ? 3 : quality >= 5 ? 8 : 6;
+      else {
+        var factor = quality === 3 ? 0.8 : quality >= 5 ? 1.3 : 1;
+        c.interval = Math.max(c.interval + 1, Math.round(c.interval * c.ef * factor));
+      }
     }
     c.ef = Math.max(1.3, c.ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
     c.due = U.addDays(today, c.interval);
@@ -30,9 +33,14 @@
     return c;
   }
 
+  /** Vorschau: Intervall in Tagen bei gegebener Bewertung */
+  function previewInterval(card, quality) {
+    return review(card || newCard(), quality).interval;
+  }
+
   function isDue(card, day) {
     return card.due <= (day || U.dayStr());
   }
 
-  APP.srs = { newCard: newCard, review: review, isDue: isDue };
+  APP.srs = { newCard: newCard, review: review, isDue: isDue, previewInterval: previewInterval };
 })(window.APP);

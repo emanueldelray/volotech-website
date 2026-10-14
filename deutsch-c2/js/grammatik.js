@@ -343,6 +343,7 @@
     topics: topics,
     items: items,
     getItem: getItem,
+    topicOf: function (itemId) { var it = getItem(itemId); return it ? it.topic : null; },
     render: render,
     review: {
       estimateSec: 45,

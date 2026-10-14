@@ -89,7 +89,8 @@
       h('h2', null, 'Einstellungen'),
       h('div', { class: 'fields' },
         numField('Tägliche Wiederholung (Minuten)', 'maintenanceMinutes', 3, 60, 1),
-        numField('Aufgaben pro Runde', 'sessionSize', 5, 30, 1),
+        numField('Aufgaben pro Runde (Grammatik)', 'sessionSize', 5, 30, 1),
+        numField('Neue Wortschatzkarten pro Tag', 'vocabNewPerDay', 0, 100, 5),
         numField('Ziel-Fokusanteil (%)', 'focusTarget', 50, 100, 5, 100))));
 
     el.appendChild(h('section', { class: 'card danger-zone' },
