@@ -534,10 +534,11 @@
     var fRegister = h('select', null, REGISTERS.map(function (r) { return h('option', { value: r, selected: (pre.register || 'neutral') === r || null }, r); }));
     var fColloc = h('textarea', { rows: 3 }); fColloc.value = (pre.collocations || []).join('\n');
     var fTags = h('input', { type: 'text', value: (pre.tags || []).join(', ') });
-    var deckOpts = decks().map(function (d) { return h('option', { value: d.id, selected: (pre.deck || 'eigene') === d.id || null }, d.title); });
+    var targetDeck = { id: pre.deck || 'eigene', title: pre.deckTitle || 'Eigene Karten' };
+    var deckOpts = decks().map(function (d) { return h('option', { value: d.id, selected: targetDeck.id === d.id || null }, d.title); });
     var fDeck = h('select', null, deckOpts, h('option', { value: '__new' }, '+ Neues Deck …'));
-    if (!decks().some(function (d) { return d.id === (pre.deck || 'eigene'); })) {
-      fDeck.insertBefore(h('option', { value: 'eigene', selected: true }, 'Eigene Karten'), fDeck.firstChild);
+    if (!decks().some(function (d) { return d.id === targetDeck.id; })) {
+      fDeck.insertBefore(h('option', { value: targetDeck.id, selected: true }, targetDeck.title), fDeck.firstChild);
     }
     var fNewDeck = h('input', { type: 'text', placeholder: 'Name des neuen Decks', hidden: true });
     fDeck.addEventListener('change', function () { fNewDeck.hidden = fDeck.value !== '__new'; if (!fNewDeck.hidden) fNewDeck.focus(); });
@@ -580,15 +581,17 @@
       }
       var o = own();
       if (newDeck) o.decks.push(newDeck);
-      if (deckId === 'eigene' && !decks().some(function (d) { return d.id === 'eigene'; })) o.decks.push({ id: 'eigene', title: 'Eigene Karten' });
+      if (deckId === targetDeck.id && !decks().some(function (d) { return d.id === targetDeck.id; })) o.decks.push(targetDeck);
       if (isSeed) {
         o.overrides[existing.id] = data;
       } else if (existing) {
         var idx = o.cards.findIndex(function (c) { return c.id === existing.id; });
         o.cards[idx] = Object.assign({}, existing, data);
       } else {
-        o.cards.push(Object.assign({ id: 'w-u-' + Date.now().toString(36), source: 'user', createdAt: Date.now() }, data,
-          pre.origin ? { origin: pre.origin } : {}));
+        var created = Object.assign({ id: 'w-u-' + Date.now().toString(36), source: 'user', createdAt: Date.now() }, data,
+          pre.origin ? { origin: pre.origin } : {});
+        o.cards.push(created);
+        if (typeof pre.onSaved === 'function') pre.onSaved(created);
       }
       APP.store.save();
       U.toast(existing ? 'Karte gespeichert.' : 'Karte angelegt.');

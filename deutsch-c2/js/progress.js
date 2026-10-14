@@ -3,17 +3,26 @@
   'use strict';
   var U = APP.util;
 
-  var MASTERY = { window: 30, accuracy: 0.9, days: 3 };
-  var NEEDED_CORRECT = Math.ceil(MASTERY.window * MASTERY.accuracy); // 27
+  // Standardregel; Module können eine eigene Regel (mod.mastery) festlegen
+  var MASTERY = { window: 30, accuracy: 0.9, days: 3, unit: 'Aufgaben' };
+
+  function ruleFor(moduleId) {
+    var m = APP.modules[moduleId];
+    return Object.assign({}, MASTERY, (m && m.mastery) || {});
+  }
 
   function S() { return APP.store.state; }
   function topicKey(m, t) { return m + ':' + t; }
 
-  /** Antwort protokollieren. Gibt { mastered: true } zurück, wenn das Thema dadurch neu beherrscht ist. */
+  /**
+   * Antwort protokollieren. correct: true/false oder Anteil 0–1 (z. B. Textbewertung).
+   * Gibt { mastered: true } zurück, wenn das Thema dadurch neu beherrscht ist.
+   */
   function record(moduleId, topicId, itemId, correct, opts) {
     opts = opts || {};
+    var c = typeof correct === 'number' ? Math.max(0, Math.min(1, correct)) : correct ? 1 : 0;
     APP.store.addAttempt({
-      m: moduleId, t: topicId, i: itemId, c: correct ? 1 : 0,
+      m: moduleId, t: topicId, i: itemId, c: c,
       d: U.dayStr(), ts: Date.now(), r: opts.review ? 1 : 0
     });
     var result = { mastered: false };
@@ -26,14 +35,15 @@
   }
 
   function topicStats(moduleId, topicId) {
+    var R = ruleFor(moduleId);
     var all = S().attempts.filter(function (a) { return a.m === moduleId && a.t === topicId; });
-    var last = all.slice(-MASTERY.window);
+    var last = all.slice(-R.window);
     var correct = last.reduce(function (s, a) { return s + a.c; }, 0);
     var days = {};
     last.forEach(function (a) { days[a.d] = 1; });
     var nDays = Object.keys(days).length;
     var n = last.length;
-    var mastered = n >= MASTERY.window && correct / n >= MASTERY.accuracy && nDays >= MASTERY.days;
+    var mastered = n >= R.window && correct / n >= R.accuracy - 1e-9 && nDays >= R.days;
     return {
       total: all.length,
       n: n,
@@ -41,9 +51,14 @@
       accuracy: n ? correct / n : 0,
       days: nDays,
       mastered: mastered,
-      // Fortschritt Richtung 27/30 richtig, gedeckelt solange < 3 Tage
-      progress: Math.min(1, correct / NEEDED_CORRECT) * (nDays >= MASTERY.days ? 1 : 0.97)
+      // Fortschritt Richtung z. B. 27/30 richtig, gedeckelt solange die Tage fehlen
+      progress: Math.min(1, correct / (R.window * R.accuracy)) * (nDays >= R.days ? 1 : 0.97)
     };
+  }
+
+  /** Versuche zu einem Item entfernen (z. B. wenn ein Textfeedback ersetzt wird). */
+  function removeAttempts(moduleId, itemId) {
+    S().attempts = S().attempts.filter(function (a) { return !(a.m === moduleId && a.i === itemId); });
   }
 
   function isMastered(moduleId, topicId) {
@@ -149,7 +164,7 @@
   }
 
   APP.progress = {
-    MASTERY: MASTERY, record: record, topicStats: topicStats, isMastered: isMastered,
+    MASTERY: MASTERY, ruleFor: ruleFor, record: record, removeAttempts: removeAttempts, topicStats: topicStats, isMastered: isMastered,
     syncSrs: syncSrs, dueCards: dueCards, maintenancePlan: maintenancePlan,
     maintenanceBudget: maintenanceBudget, reviewCard: reviewCard,
     dayTotal: dayTotal, streak: streak, timeByModule: timeByModule

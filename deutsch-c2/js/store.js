@@ -28,8 +28,10 @@
       time: {},
       // Vom Nutzer geprüfte Inhalte: { 'grammatik:g-konj1-01': true }
       verified: {},
-      // Importierte Inhalte (Phase 4): { grammatik: { topics: [], items: [] } }
+      // Eigene/importierte Inhalte: { grammatik: { topics, items }, wortschatz: { decks, cards, overrides }, schreiben: { tasks } }
       content: {},
+      // Schreiben: Entwürfe pro Aufgabe und abgegebene Texte mit Feedback
+      writing: { drafts: {}, submissions: [] },
       meta: { lastBackup: null }
     };
   }

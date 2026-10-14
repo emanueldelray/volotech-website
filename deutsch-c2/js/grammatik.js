@@ -331,6 +331,18 @@
       h('a', { class: 'btn primary', href: '#/grammatik/ueben/' + encodeURIComponent(topicId) }, 'Dieses Thema üben')));
   }
 
+  /** Neue Aufgabe speichern (z. B. aus dem Schreib-Feedback). topicDef legt das Thema bei Bedarf an. */
+  function addItem(item, topicDef) {
+    var c = APP.store.state.content;
+    if (!c[ID]) c[ID] = {};
+    c[ID].topics = c[ID].topics || [];
+    c[ID].items = c[ID].items || [];
+    if (topicDef && !topics().some(function (t) { return t.id === topicDef.id; })) c[ID].topics.push(topicDef);
+    c[ID].items.push(item);
+    APP.store.save();
+    return item;
+  }
+
   function render(el, params) {
     if (params[0] === 'ueben' && params[1]) return renderSession(el, params[1]);
     if (params[0] === 'thema' && params[1]) return renderTopicItems(el, params[1]);
@@ -345,6 +357,7 @@
     getItem: getItem,
     topicOf: function (itemId) { var it = getItem(itemId); return it ? it.topic : null; },
     render: render,
+    addItem: addItem,
     review: {
       estimateSec: 45,
       render: function (el, itemId, done) {

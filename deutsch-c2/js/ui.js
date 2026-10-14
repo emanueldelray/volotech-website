@@ -4,7 +4,10 @@
   var U = APP.util, h = U.h;
 
   function statusOf(moduleId, topicId, stats) {
-    if (APP.progress.isMastered(moduleId, topicId)) return { key: 'done', label: 'Beherrscht · Wiederholung' };
+    if (APP.progress.isMastered(moduleId, topicId)) {
+      var mod = APP.modules[moduleId];
+      return { key: 'done', label: mod && mod.review ? 'Beherrscht · Wiederholung' : 'Beherrscht' };
+    }
     if (!stats.total) return { key: 'new', label: 'Neu' };
     return { key: 'work', label: 'In Arbeit' };
   }
@@ -14,13 +17,13 @@
     opts = opts || {};
     var st = APP.progress.topicStats(moduleId, topic.id);
     var status = statusOf(moduleId, topic.id, st);
-    var M = APP.progress.MASTERY;
+    var M = APP.progress.ruleFor(moduleId);
     var pct = status.key === 'done' ? 100 : Math.round(st.progress * 100);
     var detail = status.key === 'done'
-      ? 'Ins Wiederholungssystem übernommen'
+      ? (APP.modules[moduleId] && APP.modules[moduleId].review ? 'Ins Wiederholungssystem übernommen' : 'Beherrscht')
       : st.n
-        ? (st.n < M.window ? st.n + ' von ' + M.window + ' Aufgaben' : 'Letzte ' + M.window) +
-          ' · ' + Math.round(st.accuracy * 100) + ' % richtig · ' + Math.min(st.days, M.days) + '/' + M.days + ' Tage'
+        ? (st.n < M.window ? st.n + ' von ' + M.window + ' ' + M.unit : 'Letzte ' + M.window) +
+          ' · ' + Math.round(st.accuracy * 100) + ' ' + (M.accuracyLabel || '% richtig') + ' · ' + Math.min(st.days, M.days) + '/' + M.days + ' Tage'
         : 'Noch nicht geübt';
     return h('div', { class: 'topic-row status-' + status.key },
       h('div', { class: 'topic-head' },

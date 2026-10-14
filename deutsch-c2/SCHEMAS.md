@@ -1,6 +1,6 @@
 # JSON-Schemas
 
-> Stand Phase 2: Grammatik und Wortschatz. Lese-/Hörfragen sowie der fertige
+> Stand Phase 3: Grammatik, Wortschatz, Schreiben. Lese-/Hörfragen sowie der fertige
 > Claude-Prompt für die Inhaltserstellung folgen in Phase 4 zusammen mit dem
 > Bildschirm „Inhalte importieren“.
 
@@ -111,3 +111,69 @@ Beispiel:
 Eigene Karten (Editor) und Korrekturen an mitgelieferten Karten werden im
 Lernstand gespeichert (`content.wortschatz.cards` / `.overrides`) und sind im
 Export enthalten.
+
+## Schreiben
+
+Datei: `content/schreiben.js` → `window.DATA.schreiben = { types: [...], tasks: [...] }`
+
+### Textsorte (Typ)
+
+```json
+{ "id": "eroerterung", "title": "Erörterung", "description": "optional" }
+```
+
+### Aufgabe
+
+| Feld | Typ | Pflicht | Hinweis |
+|---|---|---|---|
+| `id` | string | ja | eindeutig, z. B. `s-er-04` |
+| `type` | string | ja | `id` einer Textsorte |
+| `title` | string | ja | |
+| `prompt` | string | ja | Aufgabenstellung (Zeilenumbrüche mit `\n`) |
+| `source` | string | nein | Ausgangstext, v. a. für Umformulierungen |
+| `words` | [number, number] | ja | Zielumfang min/max |
+| `minutes` | number | ja | Bearbeitungszeit |
+| `status` | `"ungeprüft"` | nein | |
+
+### Feedback-JSON von Claude (fest vorgegeben)
+
+Der Prompt „Für Claude kopieren“ verlangt am Ende der Antwort genau einen
+` ```json `-Block in diesem Format:
+
+```json
+{
+  "schema": "deutsch-c2-schreiben-1",
+  "bewertung": {
+    "aufgabenerfuellung": 3, "kohaerenz": 3.5, "wortschatz": 3, "strukturen": 4,
+    "prozent": 68,
+    "niveau": "C1"
+  },
+  "fehler": [
+    {
+      "kategorie": "Grammatik",
+      "original": "Wegen dem Fachkräftemangel",
+      "korrektur": "Wegen des Fachkräftemangels",
+      "satz": "Wegen dem Fachkräftemangel sollten Firmen flexibel sein.",
+      "satzKorrigiert": "Wegen des Fachkräftemangels sollten Firmen flexibel sein.",
+      "erklaerung": "„wegen“ verlangt schriftsprachlich den Genitiv.",
+      "regel": "Präposition wegen + Genitiv"
+    }
+  ]
+}
+```
+
+| Feld | Pflicht | Hinweis |
+|---|---|---|
+| `bewertung.aufgabenerfuellung` / `kohaerenz` / `wortschatz` / `strukturen` | ja | 0–5 (Dezimalzahlen erlaubt) |
+| `bewertung.prozent` | ja | 0–100; zählt als Ergebnis des Textes für die Beherrschung |
+| `bewertung.niveau` | nein | „C2“, „C1“, „B2“, „unter B2“ |
+| `fehler[].kategorie` | ja | Grammatik, Wortschatz, Register, Stil, Kohärenz, Rechtschreibung/Zeichensetzung (ähnliche Schreibweisen werden zugeordnet) |
+| `fehler[].original` | ja | exaktes Zitat – wird im Text markiert |
+| `fehler[].korrektur` | ja | |
+| `fehler[].satz` / `satzKorrigiert` | nein | ganze Sätze → werden zur Grammatik-Korrekturaufgabe |
+| `fehler[].erklaerung` | nein | |
+| `fehler[].regel` | nein | kurzer Regelname; gruppiert wiederkehrende Fehler in der Statistik |
+
+Aus einem Fehler erzeugte Grammatikaufgaben landen im Thema
+`eigene-fehler` („Fehler aus meinen Texten“), Wortschatzkarten im Deck
+`aus-texten` („Aus meinen Texten“).

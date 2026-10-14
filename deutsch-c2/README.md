@@ -9,7 +9,7 @@ Lokale Lern-App ohne Framework, Build-Schritt oder Backend. Öffnen Sie einfach
 |---|---|---|
 | 1 | App-Shell, Dashboard, Fokus/Beherrschung, Wiederholung (SM-2), Sicherung, **Grammatik** | ✅ |
 | 2 | **Wortschatz** mit Spaced Repetition, Karteneditor | ✅ |
-| 3 | Schreiben (Claude-Brücke, Fehlerstatistik) | – |
+| 3 | **Schreiben** mit Claude-Brücke, Fehlerstatistik, Fehler → Übung | ✅ |
 | 4 | Lesen, Hören, Inhalte importieren | – |
 
 ## Ordnerstruktur
@@ -19,6 +19,7 @@ index.html
 css/app.css
 content/grammatik.js     Inhalte (window.DATA.grammatik) – hier ergänzen
 content/wortschatz.js    Decks und Karten (window.DATA.wortschatz)
+content/schreiben.js     Textsorten und Schreibaufgaben (window.DATA.schreiben)
 js/util.js               Hilfsfunktionen, Antwortvergleich
 js/store.js              localStorage, Export/Import
 js/srs.js                SM-2-Algorithmus
@@ -31,6 +32,7 @@ js/wiederholung.js       täglicher Wartungsblock
 js/daten.js              Sicherung & Einstellungen
 js/grammatik.js          Modul Grammatik
 js/wortschatz.js         Modul Wortschatz (Karteikarten, Editor)
+js/schreiben.js          Modul Schreiben (Schreibansicht, Claude-Brücke, Statistik)
 ```
 
 Neue Inhalte: in `content/<modul>.js` eintragen – an der Logik muss nichts geändert
@@ -51,6 +53,13 @@ werden. Schema: siehe [SCHEMAS.md](SCHEMAS.md).
   seine fälligen Karten im Modul selbst (Lernstapel, max. 20 neue Lernkarten/Tag,
   einstellbar). Ist das Deck beherrscht, erscheinen seine fälligen Karten im
   täglichen Wartungsblock. Tastatur: Leertaste/Enter = aufdecken, 1–4 = bewerten.
+- **Schreiben:** Textsorten sind die Themen, ein Text ist ein „Item“ mit dem
+  Prozentwert aus Claudes Bewertung. Beherrscht = die letzten 5 Texte einer
+  Textsorte im Schnitt ≥ 80 % (an mindestens 3 Tagen). Ablauf: schreiben →
+  „Für Claude kopieren“ → in Claude einfügen → Antwort zurück einfügen →
+  Auswertung. Fehler lassen sich per Klick in Grammatikaufgaben
+  („Fehler aus meinen Texten“) oder Wortschatzkarten umwandeln – diese laufen
+  dann über das normale Beherrschungs- und Wiederholungssystem.
 - **Serie:** aufeinanderfolgende Tage mit mindestens 1 Minute Lernzeit.
 
 ## Daten

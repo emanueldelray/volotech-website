@@ -118,6 +118,28 @@ window.APP = window.APP || {};
     setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
   }
 
+  /** Text in die Zwischenablage kopieren; Promise<boolean>. Fallback für file:// */
+  function copyText(text) {
+    function legacy() {
+      var ta = h('textarea', { style: { position: 'fixed', top: '-1000px', opacity: '0' } });
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      ta.remove();
+      return ok;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return legacy(); });
+    }
+    return Promise.resolve(legacy());
+  }
+
+  function wordCount(text) {
+    return String(text || '').trim().split(/\s+/).filter(function (w) { return /[0-9A-Za-zÄÖÜäöüßÀ-ÿ]/.test(w); }).length;
+  }
+
   var toastTimer;
   function toast(msg) {
     var t = document.getElementById('toast');
@@ -132,6 +154,6 @@ window.APP = window.APP || {};
     dayStr: dayStr, parseDay: parseDay, addDays: addDays, daysBetween: daysBetween,
     lastNDays: lastNDays, fmtDate: fmtDate, fmtMinutes: fmtMinutes,
     h: h, clear: clear, normalize: normalize, matchAnswer: matchAnswer,
-    shuffle: shuffle, downloadFile: downloadFile, toast: toast
+    shuffle: shuffle, downloadFile: downloadFile, toast: toast, copyText: copyText, wordCount: wordCount
   };
 })(window.APP);
