@@ -133,6 +133,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .row-when{color:var(--fg);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 
+<noscript><p style="padding:16px;font:15px system-ui,sans-serif">This dashboard needs JavaScript. Open the file in a web browser (Chrome, Edge, Firefox or Safari). File previews in mail, Files or chat apps do not run it.</p></noscript>
 <div class="wrap">
   <header class="tb">
     <div class="tb-name">
@@ -181,7 +182,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   const state = { prospects: [], status: {}, runs: [], screening: [], sel: null, f: {prio:new Set(), risk:new Set(), status:new Set()}, q:"", view:"all" };
   const WAVES = {1:"Wave 1 · Priority A, contact now", 2:"Wave 2 · Priority B with a current reason", 3:"Wave 3 · Priority B, no urgent reason"};
   const wave = p => { const pr = p.recommendation?.priority; if (pr === "A") return 1; if (pr !== "B") return 0; return (p.timing_score||0) >= 5 ? 2 : 3; };
-  const firstSentence = t => { const m = String(t||"").trim().split(/(?<=[.!?])\s/)[0]; return m.length > 140 ? m.slice(0,139)+"…" : m; };
+  const firstSentence = t => { const x = String(t||"").trim(), f = x.match(/^[\s\S]*?[.!?](?=\s|$)/), m = f ? f[0] : x; return m.length > 140 ? m.slice(0,139)+"…" : m; };
   let db = null, canWrite = true;
 
   const $ = s => document.querySelector(s);
