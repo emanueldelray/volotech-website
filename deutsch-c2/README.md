@@ -64,6 +64,13 @@ werden. Schema: siehe [SCHEMAS.md](SCHEMAS.md).
   Auswertung. Fehler lassen sich per Klick in Grammatikaufgaben
   („Fehler aus meinen Texten“) oder Wortschatzkarten umwandeln – diese laufen
   dann über das normale Beherrschungs- und Wiederholungssystem.
+- **Eigene Texte (Beruf & Alltag):** unter Schreiben → „Eigenen Text einfügen“
+  eine selbst geschriebene E-Mail, einen Beitrag oder Bericht einfügen (Textart,
+  optional Kontext/Adressat). Claude prüft auf C2-Niveau und auf Angemessenheit
+  für Zweck und Adressaten und liefert eine versandfertige Fassung. Ergebnisse
+  zählen als eigene Textsorte und fließen in die Fehlerstatistik ein.
+  Vorher Namen und Vertrauliches durch Platzhalter ersetzen; E-Mail-Adressen,
+  Telefonnummern, Links und IBANs ersetzt die App per Klick.
 - **Lesen:** Artikel einfügen (Titel, Quelle, Text). Wort antippen = auswählen,
   zweites Wort im selben Satz = Auswahl zur Wendung erweitern (oder frei mit der
   Maus markieren) → „Als Karte speichern“ öffnet den Karteneditor mit dem Satz

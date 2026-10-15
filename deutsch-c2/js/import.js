@@ -258,7 +258,7 @@
     function fillTargets() {
       U.clear(targetSel);
       var k = kindSel.value;
-      var list = k === 'grammatik' ? APP.modules.grammatik.topics() : k === 'wortschatz' ? APP.modules.wortschatz.topics() : APP.modules.schreiben.topics();
+      var list = k === 'grammatik' ? APP.modules.grammatik.topics() : k === 'wortschatz' ? APP.modules.wortschatz.topics() : APP.modules.schreiben.taskTypes();
       list.forEach(function (t) { targetSel.appendChild(h('option', { value: t.id }, t.title)); });
       if (k !== 'schreiben') targetSel.appendChild(h('option', { value: '__new' }, k === 'grammatik' ? '+ Neues Thema …' : '+ Neues Deck …'));
       newName.placeholder = k === 'grammatik' ? 'Name des neuen Themas' : 'Name des neuen Decks';

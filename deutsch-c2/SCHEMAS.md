@@ -199,6 +199,12 @@ Der Prompt „Für Claude kopieren“ verlangt am Ende der Antwort genau einen
 | `fehler[].erklaerung` | nein | |
 | `fehler[].regel` | nein | kurzer Regelname; gruppiert wiederkehrende Fehler in der Statistik |
 
+Eigene Texte (Textsorte `frei`, „Eigene Texte (Beruf & Alltag)“) nutzen
+dasselbe Feedback-JSON. `aufgabenerfuellung` bewertet dort die Angemessenheit
+für Zweck und Adressaten (Ton, Höflichkeit, Klarheit, Textsortenkonventionen).
+Die Textsorte `frei` ist fest eingebaut und kann nicht für importierte
+Schreibaufgaben verwendet werden.
+
 Aus einem Fehler erzeugte Grammatikaufgaben landen im Thema
 `eigene-fehler` („Fehler aus meinen Texten“), Wortschatzkarten im Deck
 `aus-texten` („Aus meinen Texten“).

@@ -32,7 +32,12 @@
     c[ID].tasks = c[ID].tasks || [];
     return c[ID];
   }
-  function types() { return seed().types; }
+  // Eigene Texte aus Beruf und Alltag: fest eingebaute Textsorte ohne Aufgabenbibliothek
+  var FREE = { id: 'frei', title: 'Eigene Texte (Beruf & Alltag)', description: 'Selbst geschriebene E-Mails, Beiträge und Berichte prüfen lassen.' };
+  var FREE_KINDS = ['E-Mail', 'LinkedIn-/Social-Media-Beitrag', 'Bericht / Protokoll', 'Präsentationstext', 'Sonstiges'];
+
+  function types() { return seed().types.concat([FREE]); }
+  function taskTypes() { return seed().types; }
   function typeById(id) { return types().filter(function (t) { return t.id === id; })[0] || { id: id, title: id }; }
   function tasks() { return seed().tasks.concat(own().tasks); }
   function taskById(id) { return tasks().filter(function (t) { return t.id === id; })[0] || null; }
@@ -50,6 +55,7 @@
 
   function buildPrompt(sub) {
     var t = sub.task;
+    if (sub.type === FREE.id) return buildFreePrompt(sub);
     var lines = [];
     lines.push('Du bist ein strenger Prüfer für das Goethe-Zertifikat C2: Großes Deutsches Sprachdiplom (Modul Schreiben). Bewerte meinen Text kompromisslos auf C2-Niveau. Antworte auf Deutsch.');
     lines.push('');
@@ -78,6 +84,37 @@
     lines.push('1. **Fehlerliste:** Liste JEDEN Fehler einzeln auf, auch kleine. Ordne jeden Fehler genau einer Kategorie zu: ' + CATEGORIES.join(', ') + '. Zitiere die fehlerhafte Stelle wörtlich, gib die Korrektur an und erkläre den Fehler kurz (ein bis zwei Sätze). Markiere auch Formulierungen, die zwar korrekt, aber für C2 zu einfach, unidiomatisch oder registerfremd sind (Kategorie Wortschatz, Register oder Stil).');
     lines.push('2. **C2-Fassung:** Schreibe eine vollständige Neufassung meines Textes auf C2-Niveau, die meine Gedanken und meinen Aufbau so weit wie möglich beibehält.');
     lines.push('3. **Bewertung:** Bewerte angelehnt an die Kriterien des Goethe-Zertifikats C2 – Aufgabenerfüllung, Kohärenz, Wortschatz, Strukturen – jeweils mit 0–5 Punkten (5 = voll auf C2-Niveau) und einer kurzen Begründung. Gib eine Gesamteinschätzung in Prozent (0–100; 60 = knapp bestanden) und das erreichte Niveau an. Nenne die drei wichtigsten Punkte, an denen ich arbeiten sollte.');
+    appendJsonRules(lines);
+    return lines.join('\n');
+  }
+
+  /** Prompt für eigene Texte (E-Mail, Beitrag …): C2-Maßstab + Angemessenheit für Zweck und Adressaten */
+  function buildFreePrompt(sub) {
+    var t = sub.task;
+    var lines = [];
+    lines.push('Du bist ein strenger Prüfer für Deutsch auf C2-Niveau (Orientierung: Goethe-Zertifikat C2) und zugleich ein erfahrener Lektor für berufliche Kommunikation. Antworte auf Deutsch.');
+    lines.push('Ich bin kein Muttersprachler und habe den folgenden Text in meinem Berufsalltag geschrieben. Bewerte ihn kompromisslos: Ziel ist, dass er wie von einem gebildeten Muttersprachler formuliert wirkt.');
+    lines.push('');
+    lines.push('## Angaben zum Text');
+    lines.push('Textart: ' + t.textart);
+    if (t.kontext) lines.push('Kontext / Adressat: ' + t.kontext);
+    lines.push('Umfang: ' + sub.words + ' Wörter');
+    lines.push('Platzhalter wie [Name], [Firma] oder [Zahl] sind absichtlich anonymisiert und kein Fehler.');
+    lines.push('');
+    lines.push('## Mein Text');
+    lines.push('"""');
+    lines.push(sub.text);
+    lines.push('"""');
+    lines.push('');
+    lines.push('## Deine Aufgaben');
+    lines.push('1. **Fehlerliste:** Liste JEDEN Fehler einzeln auf, auch kleine. Ordne jeden Fehler genau einer Kategorie zu: ' + CATEGORIES.join(', ') + '. Zitiere die Stelle wörtlich, gib die Korrektur an und erkläre kurz. Markiere besonders: Formulierungen, die korrekt, aber unidiomatisch, „übersetzt“ oder für C2 zu einfach wirken; unpassendes Register oder einen unpassenden Ton für diesen Adressaten (zu steif, zu salopp, zu direkt, zu unterwürfig); typische Lernerfehler, die Muttersprachler nicht machen würden.');
+    lines.push('2. **Überarbeitete Fassung:** Schreibe eine Fassung, die ich in dieser Situation genau so verschicken bzw. veröffentlichen könnte. Behalte Inhalt, Länge und Absicht bei; ändere nur, was sprachlich oder stilistisch nötig ist.');
+    lines.push('3. **Bewertung:** Bewerte mit je 0–5 Punkten (5 = voll auf C2-Niveau) und kurzer Begründung: "aufgabenerfuellung" = Angemessenheit für Zweck und Adressaten (Ton, Höflichkeit, Klarheit des Anliegens, Textsortenkonventionen); "kohaerenz"; "wortschatz"; "strukturen". Gib eine Gesamteinschätzung in Prozent (0–100) und das Niveau an. Nenne die drei wichtigsten Punkte, an denen ich arbeiten sollte, und 3–5 idiomatische Wendungen aus deiner Fassung, die ich mir merken sollte.');
+    appendJsonRules(lines);
+    return lines.join('\n');
+  }
+
+  function appendJsonRules(lines) {
     lines.push('4. **JSON:** Beende deine Antwort mit GENAU EINEM Codeblock ```json … ``` nach dem folgenden Schema. Nach dem Codeblock folgt kein weiterer Text.');
     lines.push('');
     lines.push('```json');
@@ -102,7 +139,6 @@
     lines.push('- "satzKorrigiert" unterscheidet sich von "satz" nur durch die Korrektur dieses einen Fehlers.');
     lines.push('- "regel" ist eine kurze, allgemeine Bezeichnung des Fehlertyps (z. B. "Konjunktiv I in indirekter Rede", "Rektion: verfügen über", "Komma vor Infinitivgruppe mit um … zu", "Register: umgangssprachlich in formellem Brief"). Verwende für gleiche Fehlertypen immer exakt dieselbe Bezeichnung.');
     lines.push('- Jeder Fehler aus der Fehlerliste erscheint genau einmal im JSON; "niveau" ist "C2", "C1", "B2" oder "unter B2".');
-    return lines.join('\n');
   }
 
   /* ---------- Feedback auslesen ---------- */
@@ -296,7 +332,15 @@
     }
     el.appendChild(info);
 
-    types().forEach(function (ty) {
+    var free = h('section', { class: 'card free-card' });
+    free.appendChild(APP.ui.masteryRow(ID, FREE));
+    var freeSubs = W().submissions.filter(function (s) { return s.type === FREE.id; });
+    free.appendChild(h('p', { class: 'small muted' }, 'Eine E-Mail, einen Beitrag oder einen Bericht, den Sie ohnehin geschrieben haben, auf C2-Niveau prüfen lassen – Fehler fließen in Statistik und Übungen ein.' +
+      (freeSubs.length ? ' Bisher ' + freeSubs.length + ' eigene Texte.' : '')));
+    free.appendChild(h('div', { class: 'actions' }, h('a', { class: 'btn primary', href: '#/schreiben/frei' }, 'Eigenen Text einfügen')));
+    el.appendChild(free);
+
+    taskTypes().forEach(function (ty) {
       var sec = h('section', { class: 'card' });
       sec.appendChild(APP.ui.masteryRow(ID, ty));
       var list = h('ul', { class: 'task-list' });
@@ -520,7 +564,8 @@
       h('a', { href: '#/schreiben/texte', class: 'back' }, '← Meine Texte'),
       h('div', { class: 'eyebrow' }, sub.task.typeTitle),
       h('h1', null, sub.task.title),
-      h('p', { class: 'muted small' }, U.fmtDate(sub.createdAt) + ' · ' + sub.words + ' Wörter · ' + Math.round(sub.seconds / 60) + ' Min.')));
+      h('p', { class: 'muted small' }, U.fmtDate(sub.createdAt) + ' · ' + sub.words + ' Wörter' +
+        (sub.type === FREE.id ? (sub.task.kontext ? ' · ' + sub.task.kontext : '') : ' · ' + Math.round(sub.seconds / 60) + ' Min.'))));
 
     var prompt = buildPrompt(sub);
     var promptBox = h('textarea', { class: 'answer-input prompt-box', rows: 8, readonly: true });
@@ -586,7 +631,9 @@
     }
 
     el.appendChild(h('div', { class: 'actions' },
-      h('a', { class: 'btn ghost', href: '#/schreiben/aufgabe/' + encodeURIComponent(sub.taskId) }, 'Aufgabe erneut schreiben'),
+      sub.type === FREE.id
+        ? h('a', { class: 'btn ghost', href: '#/schreiben/frei' }, 'Weiteren eigenen Text einfügen')
+        : h('a', { class: 'btn ghost', href: '#/schreiben/aufgabe/' + encodeURIComponent(sub.taskId) }, 'Aufgabe erneut schreiben'),
       h('button', {
         type: 'button', class: 'btn bad', onclick: function () {
           if (!window.confirm('Diesen Text samt Feedback löschen?')) return;
@@ -744,7 +791,7 @@
       h('a', { href: '#/schreiben', class: 'back' }, '← Schreiben'),
       h('h1', null, 'Eigene Aufgabe')));
     function field(label, control) { return h('label', { class: 'form-field' }, h('span', { class: 'form-label' }, label), control); }
-    var fType = h('select', null, types().map(function (t) { return h('option', { value: t.id }, t.title); }));
+    var fType = h('select', null, taskTypes().map(function (t) { return h('option', { value: t.id }, t.title); }));
     var fTitle = h('input', { type: 'text' });
     var fPrompt = h('textarea', { rows: 6 });
     var fSource = h('textarea', { rows: 5 });
@@ -786,7 +833,7 @@
   function validateTask(t) {
     var e = [];
     if (!t || typeof t !== 'object') return ['kein Objekt'];
-    if (!types().some(function (x) { return x.id === t.type; })) e.push('"type" muss eine dieser Textsorten sein: ' + types().map(function (x) { return x.id; }).join(', '));
+    if (!taskTypes().some(function (x) { return x.id === t.type; })) e.push('"type" muss eine dieser Textsorten sein: ' + taskTypes().map(function (x) { return x.id; }).join(', '));
     if (!t.title) e.push('"title" fehlt');
     if (!t.prompt) e.push('"prompt" fehlt');
     if (!Array.isArray(t.words) || t.words.length !== 2 || !(t.words[0] > 0) || !(t.words[1] >= t.words[0])) e.push('"words" muss [min, max] sein');
@@ -799,10 +846,85 @@
     APP.store.save();
   }
 
+  /* ---------- Ansicht: eigenen Text einfügen ---------- */
+
+  /** Offensichtliche Kontaktdaten durch Platzhalter ersetzen */
+  function anonymize(text) {
+    var n = 0;
+    function rep(re, ph) { text = text.replace(re, function () { n++; return ph; }); }
+    rep(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, '[E-Mail]');
+    rep(/\bhttps?:\/\/\S+|\bwww\.\S+/g, '[Link]');
+    rep(/\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){3,7}(?:\s?[A-Z0-9]{1,4})?\b/g, '[IBAN]');
+    rep(/(?:\+|\b00)\d[\d\s\/()-]{6,}\d|\b0\d{2,5}\s*[\/-]?\s*\d[\d\s-]{4,}\d/g, '[Telefon]');
+    return { text: text, count: n };
+  }
+
+  function renderFree(el) {
+    el.appendChild(h('header', { class: 'page-head' },
+      h('a', { href: '#/schreiben', class: 'back' }, '← Schreiben'),
+      h('h1', null, 'Eigenen Text prüfen lassen'),
+      h('p', { class: 'muted' }, 'Fügen Sie eine E-Mail, einen Beitrag oder einen Bericht ein, den Sie selbst geschrieben haben. Claude prüft ihn auf C2-Niveau und darauf, ob Ton und Register zum Adressaten passen.')));
+
+    el.appendChild(h('div', { class: 'notice' },
+      h('strong', null, 'Datenschutz: '),
+      'Ersetzen Sie vor dem Kopieren Namen, Firmen, Kundendaten, Beträge und alles Vertrauliche durch Platzhalter wie [Name], [Firma] oder [Projekt]. Der Text wird nur lokal gespeichert, geht aber über die Zwischenablage an Claude.'));
+
+    function field(label, control) { return h('label', { class: 'form-field' }, h('span', { class: 'form-label' }, label), control); }
+    var fKind = h('select', null, FREE_KINDS.map(function (k) { return h('option', { value: k }, k); }));
+    var fContext = h('input', { type: 'text', placeholder: 'z. B. „an einen Kunden, erste Kontaktaufnahme, formell“' });
+    var fText = h('textarea', { rows: 12, placeholder: 'Ihren Text hier einfügen …' });
+    var count = h('span', { class: 'muted small' }, '0 Wörter');
+    fText.addEventListener('input', function () { count.textContent = U.wordCount(fText.value) + ' Wörter'; });
+    var msg = h('div', { 'aria-live': 'polite' });
+
+    el.appendChild(h('form', {
+      class: 'card form', onsubmit: function (e) {
+        e.preventDefault();
+        var text = fText.value.trim();
+        if (U.wordCount(text) < 15) { U.clear(msg).appendChild(h('div', { class: 'notice bad' }, 'Bitte einen Text mit mindestens 15 Wörtern einfügen.')); return; }
+        var kind = fKind.value, ctx = fContext.value.trim();
+        var s = {
+          id: 's-' + Date.now().toString(36),
+          taskId: null,
+          type: FREE.id,
+          task: { title: kind + (ctx ? ' – ' + ctx : ''), textart: kind, kontext: ctx, prompt: '', source: '', words: null, minutes: null, typeTitle: FREE.title },
+          text: text,
+          words: U.wordCount(text),
+          seconds: 0,
+          createdAt: Date.now(),
+          feedback: null
+        };
+        W().submissions.push(s);
+        APP.store.save();
+        U.copyText(buildPrompt(s)).then(function (ok) {
+          U.toast(ok ? 'Prompt kopiert – jetzt in Claude einfügen.' : 'Kopieren nicht möglich – bitte den Prompt manuell kopieren.');
+          APP.navigate('#/schreiben/text/' + encodeURIComponent(s.id) + (ok ? '' : '/prompt'));
+        });
+      }
+    },
+      h('div', { class: 'form-row' }, field('Textart', fKind), field('Kontext / Adressat (optional)', fContext)),
+      field('Ihr Text *', fText),
+      h('div', { class: 'actions' },
+        h('button', {
+          type: 'button', class: 'btn ghost small', onclick: function () {
+            var r = anonymize(fText.value);
+            fText.value = r.text;
+            count.textContent = U.wordCount(fText.value) + ' Wörter';
+            U.toast(r.count ? r.count + ' Angaben ersetzt (E-Mail, Telefon, Links, IBAN). Namen bitte selbst prüfen.' : 'Keine E-Mail-Adressen, Telefonnummern, Links oder IBANs gefunden. Namen bitte selbst prüfen.');
+          }
+        }, 'Kontaktdaten automatisch ersetzen'),
+        count),
+      msg,
+      h('div', { class: 'actions' }, h('button', { type: 'submit', class: 'btn primary' }, 'Für Claude kopieren'))));
+    setTimeout(function () { fText.focus(); }, 30);
+  }
+
   /* ---------- Router ---------- */
 
   function render(el, params) {
     if (params[0] === 'aufgabe' && params[1]) return renderWrite(el, params[1]);
+    if (params[0] === 'frei') return renderFree(el);
+    if (params[0] === 'ueben' && params[1] === FREE.id) { location.replace('#/schreiben/frei'); return; }
     if (params[0] === 'ueben' && params[1]) {
       var t = nextTaskOf(params[1]);
       if (t) { location.replace('#/schreiben/aufgabe/' + encodeURIComponent(t.id)); return; }
@@ -832,6 +954,8 @@
     // für Tests/Import
     parseFeedback: parseFeedback,
     validateTask: validateTask,
+    taskTypes: taskTypes,
+    anonymize: anonymize,
     addTasks: addTasks,
     taskById: taskById,
     buildPrompt: buildPrompt
