@@ -118,25 +118,10 @@
     return null;
   }
 
-  function extractJson(raw) {
-    var blocks = [], re = /```(?:json)?\s*([\s\S]*?)```/gi, m;
-    while ((m = re.exec(raw))) blocks.push({ text: m[1], start: m.index, end: re.lastIndex });
-    for (var i = blocks.length - 1; i >= 0; i--) {
-      if (/"fehler"/.test(blocks[i].text)) return blocks[i];
-    }
-    // ohne Codeblock: vom ersten "{" vor "schema"/"fehler" bis zur letzten "}"
-    var key = raw.search(/"(schema|bewertung|fehler)"\s*:/);
-    if (key < 0) return null;
-    var start = raw.lastIndexOf('{', key);
-    var end = raw.lastIndexOf('}');
-    if (start < 0 || end < start) return null;
-    return { text: raw.slice(start, end + 1), start: start, end: end + 1 };
-  }
-
   /** Gibt { feedback } oder { errors: [...] } zurück. */
   function parseFeedback(raw) {
     var errors = [];
-    var block = extractJson(raw);
+    var block = U.extractJson(raw, ['fehler', 'bewertung']);
     if (!block) return { errors: ['Kein JSON-Block gefunden. Die Antwort von Claude muss mit einem ```json … ```-Block enden. Haben Sie die ganze Antwort eingefügt?'] };
     var data;
     try { data = JSON.parse(block.text); } catch (e) {
@@ -796,6 +781,24 @@
       h('div', { class: 'actions' }, h('button', { type: 'submit', class: 'btn primary' }, 'Speichern und schreiben'))));
   }
 
+  /* ---------- Import ---------- */
+
+  function validateTask(t) {
+    var e = [];
+    if (!t || typeof t !== 'object') return ['kein Objekt'];
+    if (!types().some(function (x) { return x.id === t.type; })) e.push('"type" muss eine dieser Textsorten sein: ' + types().map(function (x) { return x.id; }).join(', '));
+    if (!t.title) e.push('"title" fehlt');
+    if (!t.prompt) e.push('"prompt" fehlt');
+    if (!Array.isArray(t.words) || t.words.length !== 2 || !(t.words[0] > 0) || !(t.words[1] >= t.words[0])) e.push('"words" muss [min, max] sein');
+    if (!(Number(t.minutes) > 0)) e.push('"minutes" muss eine Zahl > 0 sein');
+    return e;
+  }
+
+  function addTasks(list) {
+    list.forEach(function (t) { own().tasks.push(t); });
+    APP.store.save();
+  }
+
   /* ---------- Router ---------- */
 
   function render(el, params) {
@@ -828,6 +831,9 @@
     render: render,
     // für Tests/Import
     parseFeedback: parseFeedback,
+    validateTask: validateTask,
+    addTasks: addTasks,
+    taskById: taskById,
     buildPrompt: buildPrompt
   });
 })(window.APP);

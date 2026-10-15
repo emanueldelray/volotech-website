@@ -18,6 +18,7 @@
       h('h2', null, 'Exportieren'),
       status,
       h('p', { class: 'muted small' }, 'Speicherbedarf: ca. ' + APP.store.sizeKB() + ' KB'),
+      h('p', { class: 'muted small' }, 'Enthalten: Lernstand, eigene und importierte Inhalte, Texte, Artikel, Transkripte. Nicht enthalten: lokal gewählte Audiodateien (Hören) – diese bei Bedarf erneut auswählen.'),
       h('div', { class: 'actions' },
         h('button', {
           type: 'button', class: 'btn primary',

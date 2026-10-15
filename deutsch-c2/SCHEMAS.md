@@ -1,8 +1,33 @@
 # JSON-Schemas
 
-> Stand Phase 3: Grammatik, Wortschatz, Schreiben. Lese-/Hörfragen sowie der fertige
-> Claude-Prompt für die Inhaltserstellung folgen in Phase 4 zusammen mit dem
-> Bildschirm „Inhalte importieren“.
+Alle Inhalte lassen sich auf zwei Wegen ergänzen:
+
+1. **Dauerhaft im Code:** in `content/<modul>.js` eintragen (Seed-Inhalte).
+2. **Per Import:** JSON unter **Import** einfügen (wird im Lernstand gespeichert
+   und ist in der Sicherung enthalten). Fehlende `id`s vergibt die App selbst;
+   importierte Inhalte sind als „ungeprüft“ markiert.
+
+Am Ende dieser Datei steht ein [fertiger Prompt](#prompt-für-claude) zum
+Erzeugen neuer Inhalte. Die App erzeugt unter **Import → 1. Prompt für Claude**
+dieselben Prompts automatisch passend zu Thema/Deck und Anzahl.
+
+## Import-Format (Umschlag)
+
+```json
+{
+  "schema": "deutsch-c2-import-1",
+  "grammatik":  { "topics": [ … ], "items": [ … ] },
+  "wortschatz": { "decks":  [ … ], "cards": [ … ] },
+  "schreiben":  { "tasks":  [ … ] },
+  "fragen":     [ … ]
+}
+```
+
+Alle Teile sind optional. Ebenfalls erkannt werden Kurzformen wie
+`{ "items": [...] }`, `{ "cards": [...] }`, `{ "tasks": [...] }`,
+`{ "fragen": [...] }` oder ein reines Array. Eine komplette Claude-Antwort mit
+` ```json `-Block kann direkt eingefügt werden. Bei Fehlern wird nichts
+importiert; jede Meldung nennt die Stelle (z. B. `grammatik.items[3]`).
 
 ## Grammatik
 
@@ -177,3 +202,111 @@ Der Prompt „Für Claude kopieren“ verlangt am Ende der Antwort genau einen
 Aus einem Fehler erzeugte Grammatikaufgaben landen im Thema
 `eigene-fehler` („Fehler aus meinen Texten“), Wortschatzkarten im Deck
 `aus-texten` („Aus meinen Texten“).
+
+## Verständnisfragen (Lesen und Hören)
+
+Wird über „Fragen bei Claude anfordern“ im Artikel bzw. Hörtext erzeugt oder
+unter **Import** einem Artikel/Hörtext zugeordnet. Neue Fragen ersetzen die
+bisherigen.
+
+```json
+{
+  "schema": "deutsch-c2-fragen-1",
+  "fragen": [
+    { "typ": "mc", "frage": "Worauf stützen sich die Befürworter?",
+      "optionen": ["Umfragen", "Pilotprojekte", "Gesetze", "Auslandsstudien"],
+      "loesung": 1, "erklaerung": "…", "beleg": "verweisen auf Pilotprojekte" },
+    { "typ": "richtigfalsch", "aussage": "Der Bundestag hat bereits entschieden.",
+      "loesung": "falsch", "erklaerung": "…", "beleg": "…" },
+    { "typ": "offen", "frage": "Welche Haltung nimmt der Autor ein?",
+      "musterantwort": "…", "erklaerung": "…" }
+  ]
+}
+```
+
+| Typ | Pflichtfelder | Bewertung |
+|---|---|---|
+| `mc` | `frage`, `optionen` (≥ 2), `loesung` (Index ab 0; auch „B“ oder der Optionstext werden erkannt) | automatisch |
+| `richtigfalsch` | `aussage`, `loesung`: `"richtig"` \| `"falsch"` \| `"nicht im Text"` | automatisch |
+| `offen` | `frage`, `musterantwort` | Selbstbewertung: richtig (1) / teilweise (0,5) / falsch (0) |
+
+`erklaerung` und `beleg` (wörtliches Kurzzitat) sind optional und werden nach
+dem Antworten angezeigt.
+
+Beherrschung: Lesen hat die Themen *Detailverständnis (mc)*,
+*Richtig/Falsch/Nicht im Text (rf)* und *Globalverständnis (offen)*; Hören hat
+*Diktat*, *Lückentext* und *Verständnisfragen*. Es gilt die Standardregel
+(≥ 90 % über die letzten 30 Antworten an ≥ 3 Tagen); Diktat und Lückentext
+zählen mit ihrem Prozentwert.
+
+## Lesen und Hören (gespeicherte Daten)
+
+Artikel (`reading.articles[]`): `id`, `title`, `source`, `url`, `text`,
+`questions`, `runs` (Ergebnisse), `saved` (gespeicherte Begriffe).
+
+Hörtexte (`listening.entries[]`): `id`, `title`, `source`, `url` *oder*
+`fileName`, `transcript`, `segments` (angepasste Zeitbereiche je Abschnitt),
+`questions`, `runs`. Lokale Audiodateien liegen in IndexedDB und sind **nicht**
+Teil der JSON-Sicherung – nach einem Import auf einem anderen Gerät fragt die
+App nach der Datei.
+
+## Prompt für Claude
+
+Diesen Prompt in einen Claude-Chat kopieren und die Platzhalter in
+`<…>` ersetzen. Die Antwort (oder nur ihren JSON-Block) unter **Import**
+einfügen.
+
+````text
+Erstelle Lernmaterial für eine Deutsch-Lern-App (Niveau C1 → C2, Orientierung:
+Goethe-Zertifikat C2: Großes Deutsches Sprachdiplom).
+
+Gewünscht: <Anzahl> <Grammatikaufgaben zum Thema „…“ (Themen-ID: …) |
+Wortschatzkarten für das Deck „…“ (Deck-ID: …) | Schreibaufgaben der Textsorte …>
+Zusätzlicher Wunsch: <optional, z. B. Schwerpunkt Wirtschaftsdeutsch>
+
+Qualitätsregeln:
+- Authentische, anspruchsvolle Sprache aus Presse, Wissenschaft und Verwaltung.
+- Grammatik: Typen "gap" (genau eine Lücke ___), "transform", "error" (ein Satz
+  mit genau einem Fehler) und "mc" (4 Optionen) mischen; bei "transform" und
+  "error" alle gängigen korrekten Varianten in "answers" aufnehmen;
+  "explanation" in 1–2 Sätzen.
+- Wortschatz: "term" in der Grundform (Nomen mit Artikel); "meaning" ist eine
+  deutsche Definition, die den Begriff selbst NICHT enthält; im "example" die
+  Stelle mit dem Begriff mit [[…]] markieren; "register" ist "neutral",
+  "gehoben", "umgangssprachlich" oder "fachsprachlich"; 1–3 Kollokationen.
+- Schreibaufgaben: "type" ist "eroerterung", "kommentar", "umformulierung" oder
+  "brief"; Umformulierungen brauchen einen Ausgangstext in "source".
+- Keine "id"-Felder – die App vergibt IDs.
+- Neue Themen bzw. Decks unter "topics" bzw. "decks" definieren
+  (id: nur a–z, 0–9 und „-“).
+
+Antworte ausschließlich mit einem einzigen ```json-Codeblock in diesem Format
+(nur die benötigten Teile):
+
+{
+  "schema": "deutsch-c2-import-1",
+  "grammatik": {
+    "topics": [{ "id": "themen-id", "title": "Titel" }],
+    "items": [
+      { "topic": "themen-id", "type": "gap", "instruction": "…",
+        "text": "Satz mit ___ .", "answers": ["…"], "explanation": "…" },
+      { "topic": "themen-id", "type": "mc", "text": "…",
+        "options": ["A", "B", "C", "D"], "correct": 0, "explanation": "…" }
+    ]
+  },
+  "wortschatz": {
+    "decks": [{ "id": "deck-id", "title": "Titel" }],
+    "cards": [
+      { "deck": "deck-id", "term": "…", "meaning": "…", "meaningEn": "…",
+        "example": "… [[…]] …", "register": "gehoben",
+        "collocations": ["…"], "tags": ["…"] }
+    ]
+  },
+  "schreiben": {
+    "tasks": [
+      { "type": "kommentar", "title": "…", "prompt": "…",
+        "words": [300, 400], "minutes": 60 }
+    ]
+  }
+}
+````

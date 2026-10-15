@@ -48,6 +48,7 @@
         return { href: '#/' + m.id, label: m.title, key: m.id, focus: m.id === focus, off: !APP.modules[m.id] };
       }))
       .concat([{ href: '#/wiederholung', label: 'Wiederholung', key: 'wiederholung' },
+               { href: '#/import', label: 'Import', key: 'import' },
                { href: '#/daten', label: 'Daten', key: 'daten' }]);
     links.forEach(function (l) {
       nav.appendChild(h('a', {

@@ -117,6 +117,14 @@
     return errors;
   }
 
+  /** Import: Decks und Karten hinzufügen (bereits geprüft) */
+  function addContent(newDecks, newCards) {
+    var o = own();
+    (newDecks || []).forEach(function (d) { if (!decks().some(function (x) { return x.id === d.id; })) o.decks.push(d); });
+    (newCards || []).forEach(function (c) { o.cards.push(c); });
+    APP.store.save();
+  }
+
   /* ---------- Planung ---------- */
 
   function introducedToday() {
@@ -659,6 +667,8 @@
     // Schnittstelle für andere Module (Schreiben, Lesen)
     openEditor: openEditor,
     validateCard: validateCard,
+    addContent: addContent,
+    cardById: cardById,
     review: {
       estimateSec: 15,
       render: function (el, subId, done) {

@@ -140,6 +140,51 @@ window.APP = window.APP || {};
     return String(text || '').trim().split(/\s+/).filter(function (w) { return /[0-9A-Za-zÄÖÜäöüßÀ-ÿ]/.test(w); }).length;
   }
 
+  /**
+   * JSON aus einer Chat-Antwort holen: letzter ```json-Block, der eines der
+   * Schlüsselwörter enthält; sonst vom ersten "{"/"[" bis zur letzten Klammer.
+   * Gibt { text, start, end } oder null zurück.
+   */
+  function extractJson(raw, keys) {
+    raw = String(raw || '');
+    var keyRe = new RegExp('"(' + (keys || []).join('|') + ')"\\s*:');
+    var blocks = [], re = /```(?:json|JSON)?\s*([\s\S]*?)```/g, m;
+    while ((m = re.exec(raw))) blocks.push({ text: m[1], start: m.index, end: re.lastIndex });
+    for (var i = blocks.length - 1; i >= 0; i--) {
+      if (!keys || keyRe.test(blocks[i].text)) return blocks[i];
+    }
+    var trimmed = raw.trim();
+    if (/^[\[{]/.test(trimmed)) return { text: trimmed, start: raw.indexOf(trimmed), end: raw.indexOf(trimmed) + trimmed.length };
+    var k = keys ? raw.search(keyRe) : -1;
+    if (k < 0) return null;
+    var start = raw.lastIndexOf('{', k);
+    var end = raw.lastIndexOf('}');
+    if (start < 0 || end < start) return null;
+    return { text: raw.slice(start, end + 1), start: start, end: end + 1 };
+  }
+
+  /** Text in Sätze zerlegen: [{ text, start, end }] (Offsets im Originaltext). */
+  function sentences(text) {
+    var out = [], re = /[^.!?…]+(?:[.!?…]+["“”»«)'’]*|$)\s*/g, m;
+    while ((m = re.exec(text)) && m[0]) {
+      var lead = m[0].match(/^\s*/)[0].length;
+      var t = m[0].trim();
+      if (t) out.push({ text: t, start: m.index + lead, end: m.index + lead + t.length });
+      if (re.lastIndex >= text.length) break;
+    }
+    // Abkürzungen (z. B., bzw., Dr., 3. Mai …) und kleingeschriebene Fortsetzungen zusammenführen
+    var abbr = /(?:^|[\s(„"])(?:[A-Za-zÄÖÜäöü]|bzw|usw|etc|ca|Dr|Prof|Nr|vgl|Mio|Mrd|Jh|St|Hr|Fr|ggf|evtl|inkl|zzgl|bspw|sog|Abs|Art|Kap|S|u\.a|d\.h|z\.B|\d+)\.$/;
+    var merged = [];
+    out.forEach(function (s) {
+      var prev = merged[merged.length - 1];
+      if (prev && (abbr.test(prev.text) || /^[a-zäöüß0-9]/.test(s.text))) {
+        prev.text = text.slice(prev.start, s.end);
+        prev.end = s.end;
+      } else merged.push(s);
+    });
+    return merged;
+  }
+
   var toastTimer;
   function toast(msg) {
     var t = document.getElementById('toast');
@@ -154,6 +199,6 @@ window.APP = window.APP || {};
     dayStr: dayStr, parseDay: parseDay, addDays: addDays, daysBetween: daysBetween,
     lastNDays: lastNDays, fmtDate: fmtDate, fmtMinutes: fmtMinutes,
     h: h, clear: clear, normalize: normalize, matchAnswer: matchAnswer,
-    shuffle: shuffle, downloadFile: downloadFile, toast: toast, copyText: copyText, wordCount: wordCount
+    shuffle: shuffle, downloadFile: downloadFile, toast: toast, copyText: copyText, wordCount: wordCount, extractJson: extractJson, sentences: sentences
   };
 })(window.APP);

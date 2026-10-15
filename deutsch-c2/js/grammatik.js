@@ -331,6 +331,30 @@
       h('a', { class: 'btn primary', href: '#/grammatik/ueben/' + encodeURIComponent(topicId) }, 'Dieses Thema üben')));
   }
 
+  /**
+   * Prüft eine Aufgabe. knownTopics: { id: true } (inkl. Themen aus demselben Import).
+   * Gibt eine Liste von Fehlermeldungen zurück.
+   */
+  function validateItem(it, knownTopics) {
+    var e = [];
+    if (!it || typeof it !== 'object') return ['kein Objekt'];
+    if (it.id !== undefined && (typeof it.id !== 'string' || !it.id.trim())) e.push('"id" muss ein Text sein');
+    if (!it.topic) e.push('"topic" fehlt');
+    else if (!knownTopics[it.topic]) e.push('Thema „' + it.topic + '“ unbekannt – unter "topics" definieren oder eine bestehende Themen-ID verwenden');
+    if (['gap', 'transform', 'error', 'mc'].indexOf(it.type) < 0) e.push('"type" muss gap, transform, error oder mc sein');
+    if (!it.text || typeof it.text !== 'string') e.push('"text" fehlt');
+    if (!it.explanation || typeof it.explanation !== 'string') e.push('"explanation" fehlt');
+    if (it.type === 'mc') {
+      if (!Array.isArray(it.options) || it.options.length < 2) e.push('"options" braucht mindestens 2 Einträge');
+      else if (typeof it.correct !== 'number' || it.correct < 0 || it.correct >= it.options.length || it.correct % 1) e.push('"correct" muss der Index der richtigen Option sein (0–' + (it.options.length - 1) + ')');
+    } else if (it.type) {
+      if (!Array.isArray(it.answers) || !it.answers.length || !it.answers.every(function (a) { return typeof a === 'string' && a.trim(); })) e.push('"answers" braucht mindestens eine Lösung (Liste von Texten)');
+      if (it.type === 'gap' && typeof it.text === 'string' && it.text.split('___').length !== 2) e.push('Lückentext braucht genau eine Lücke "___"');
+      if (it.type === 'error' && Array.isArray(it.answers) && it.answers.some(function (a) { return U.normalize(a) === U.normalize(it.text); })) e.push('bei "error" darf keine Lösung mit dem fehlerhaften Satz identisch sein');
+    }
+    return e;
+  }
+
   /** Neue Aufgabe speichern (z. B. aus dem Schreib-Feedback). topicDef legt das Thema bei Bedarf an. */
   function addItem(item, topicDef) {
     var c = APP.store.state.content;
@@ -358,6 +382,7 @@
     topicOf: function (itemId) { var it = getItem(itemId); return it ? it.topic : null; },
     render: render,
     addItem: addItem,
+    validateItem: validateItem,
     review: {
       estimateSec: 45,
       render: function (el, itemId, done) {

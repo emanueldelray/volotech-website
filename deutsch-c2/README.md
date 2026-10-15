@@ -10,7 +10,7 @@ Lokale Lern-App ohne Framework, Build-Schritt oder Backend. Öffnen Sie einfach
 | 1 | App-Shell, Dashboard, Fokus/Beherrschung, Wiederholung (SM-2), Sicherung, **Grammatik** | ✅ |
 | 2 | **Wortschatz** mit Spaced Repetition, Karteneditor | ✅ |
 | 3 | **Schreiben** mit Claude-Brücke, Fehlerstatistik, Fehler → Übung | ✅ |
-| 4 | Lesen, Hören, Inhalte importieren | – |
+| 4 | **Lesen**, **Hören**, **Inhalte importieren** | ✅ |
 
 ## Ordnerstruktur
 
@@ -33,6 +33,10 @@ js/daten.js              Sicherung & Einstellungen
 js/grammatik.js          Modul Grammatik
 js/wortschatz.js         Modul Wortschatz (Karteikarten, Editor)
 js/schreiben.js          Modul Schreiben (Schreibansicht, Claude-Brücke, Statistik)
+js/fragen.js             Verständnisfragen: Prompt, Prüfung, Durchlauf (Lesen + Hören)
+js/lesen.js              Modul Lesen (Artikel, Wörter antippen → Karte)
+js/hoeren.js             Modul Hören (Player, Diktat, Lückentext, Audio in IndexedDB)
+js/import.js             Inhalte importieren + Prompt zum Erzeugen
 ```
 
 Neue Inhalte: in `content/<modul>.js` eintragen – an der Logik muss nichts geändert
@@ -60,6 +64,17 @@ werden. Schema: siehe [SCHEMAS.md](SCHEMAS.md).
   Auswertung. Fehler lassen sich per Klick in Grammatikaufgaben
   („Fehler aus meinen Texten“) oder Wortschatzkarten umwandeln – diese laufen
   dann über das normale Beherrschungs- und Wiederholungssystem.
+- **Lesen:** Artikel einfügen (Titel, Quelle, Text). Wort antippen = auswählen,
+  zweites Wort im selben Satz = Auswahl zur Wendung erweitern (oder frei mit der
+  Maus markieren) → „Als Karte speichern“ öffnet den Karteneditor mit dem Satz
+  als Lückensatz. „Fragen bei Claude anfordern“ kopiert einen Prompt; die
+  JSON-Antwort zurück einfügen und die Fragen in der App beantworten.
+- **Hören:** Audio per URL oder lokaler Datei (gespeichert in IndexedDB) plus
+  Transkript. Player mit 0,75×/1×/1,25× und 5-Sekunden-Rücksprung. Diktat und
+  Lückentext arbeiten mit Abschnitten des Transkripts; der Zeitbereich wird aus
+  der Textposition geschätzt und lässt sich mit ±1 s anpassen (wird gespeichert).
+- **Import:** JSON aus einem Claude-Chat einfügen, prüfen, übernehmen. Der
+  passende Erzeugungs-Prompt wird auf derselben Seite erstellt.
 - **Serie:** aufeinanderfolgende Tage mit mindestens 1 Minute Lernzeit.
 
 ## Daten

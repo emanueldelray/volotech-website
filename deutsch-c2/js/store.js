@@ -32,6 +32,9 @@
       content: {},
       // Schreiben: Entwürfe pro Aufgabe und abgegebene Texte mit Feedback
       writing: { drafts: {}, submissions: [] },
+      // Lesen: eingefügte Artikel mit Fragen; Hören: Hörtexte (Audio-Dateien liegen in IndexedDB)
+      reading: { articles: [] },
+      listening: { entries: [] },
       meta: { lastBackup: null }
     };
   }
@@ -90,6 +93,7 @@
   function exportJSON() {
     state.meta.lastBackup = Date.now();
     save();
+    // Hinweis: lokale Audiodateien (IndexedDB) sind nicht Teil der Sicherung
     return JSON.stringify({ app: 'deutsch-c2', exportedAt: new Date().toISOString(), data: state }, null, 1);
   }
 
