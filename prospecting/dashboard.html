@@ -1,0 +1,461 @@
+<title>Volotech Prospect Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: master list (ranked prospects) left, dossier right; stacks to one column under 900px. Drawing-sheet title block in the header. */
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --fg:#17202b; --muted:#5b6876; --line:#d6dde4; --line-strong:#aab5c1;
+  --accent:#1d4f9c; --accent-soft:#e3ebf7;
+  --good:#1f7a4d; --good-soft:#e2f2e9; --warn:#a86200; --warn-soft:#fbefd9; --bad:#b3261e; --bad-soft:#f8e1df; --none:#7b8794; --none-soft:#eceff2;
+  --f-display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141a; --panel:#161d25; --fg:#e4e9ee; --muted:#93a0ad; --line:#26313c; --line-strong:#3a4856;
+  --accent:#7aa7ec; --accent-soft:#1b2a40;
+  --good:#5cc495; --good-soft:#15291f; --warn:#e6a54a; --warn-soft:#2f2412; --bad:#f08079; --bad-soft:#331816; --none:#8a96a3; --none-soft:#1f2730;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --panel:#161d25; --fg:#e4e9ee; --muted:#93a0ad; --line:#26313c; --line-strong:#3a4856;
+  --accent:#7aa7ec; --accent-soft:#1b2a40;
+  --good:#5cc495; --good-soft:#15291f; --warn:#e6a54a; --warn-soft:#2f2412; --bad:#f08079; --bad-soft:#331816; --none:#8a96a3; --none-soft:#1f2730;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+a{color:var(--accent)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* title block */
+.tb{display:grid;grid-template-columns:minmax(0,1fr) auto;border:1.5px solid var(--line-strong);background:var(--panel)}
+.tb-name{padding:14px 18px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tb-name h1{margin:0;font-family:var(--f-display);font-stretch:80%;font-weight:800;font-size:clamp(22px,3vw,30px);letter-spacing:.01em;text-wrap:balance}
+.tb-name p{margin:0;color:var(--muted);font-size:14px}
+.tb-cells{display:grid;grid-template-columns:repeat(4,minmax(86px,auto));border-left:1.5px solid var(--line-strong)}
+.tb-cell{padding:8px 14px;border-left:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}
+.tb-cell:first-child{border-left:0}
+.tb-cell span{font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tb-cell b{font-family:var(--f-display);font-stretch:85%;font-size:24px;font-variant-numeric:tabular-nums}
+@media (max-width:760px){.tb{grid-template-columns:1fr}.tb-cells{border-left:0;border-top:1.5px solid var(--line-strong);grid-template-columns:repeat(4,1fr)}}
+
+/* filters */
+.bar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.grp>span{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:2px}
+.chip{border:1px solid var(--line-strong);background:var(--panel);border-radius:3px;padding:3px 10px;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.search{border:1px solid var(--line-strong);background:var(--panel);border-radius:3px;padding:5px 10px;min-width:0;width:220px;max-width:100%}
+
+/* main grid */
+.main{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+.list{display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel)}
+.row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 12px 11px 0;border-top:1px solid var(--line);cursor:pointer;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;width:100%}
+.row:first-child{border-top:0}
+.row:hover{background:var(--accent-soft)}
+.row[aria-current="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.prio{font-family:var(--f-display);font-weight:800;font-size:18px;text-align:center}
+.prio.A{color:var(--good)}.prio.B{color:var(--accent)}.prio.C{color:var(--warn)}.prio.X{color:var(--bad)}
+.row-main{min-width:0;display:flex;flex-direction:column;gap:2px}
+.row-main b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-main small{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.meters{display:flex;gap:6px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.meter{display:flex;align-items:center;gap:4px}
+.meter i{display:block;width:34px;height:5px;background:var(--line);position:relative}
+.meter i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--v);background:var(--accent)}
+
+.pill{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-mono);font-size:11px;padding:1px 7px;border-radius:2px;white-space:nowrap}
+.r-low{background:var(--good-soft);color:var(--good)}.r-medium{background:var(--warn-soft);color:var(--warn)}.r-high{background:var(--bad-soft);color:var(--bad)}.r-unknown{background:var(--none-soft);color:var(--none)}
+.s-new{background:var(--none-soft);color:var(--none)}.s-contact{background:var(--accent-soft);color:var(--accent)}.s-contacted{background:var(--accent-soft);color:var(--accent)}.s-later{background:var(--warn-soft);color:var(--warn)}.s-won{background:var(--good-soft);color:var(--good)}.s-drop{background:var(--bad-soft);color:var(--bad)}
+
+/* dossier */
+.dossier{background:var(--panel);border:1px solid var(--line);min-width:0}
+.d-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.d-head h2{margin:0;font-family:var(--f-display);font-stretch:85%;font-weight:750;font-size:26px;line-height:1.15;text-wrap:balance}
+.d-meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--muted);font-size:13.5px}
+.d-summary{margin:0;max-width:75ch}
+.scores{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.score{padding:12px 22px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.score:first-child{border-left:0}
+.score span{font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.score b{font-family:var(--f-display);font-stretch:85%;font-size:22px;font-variant-numeric:tabular-nums}
+.score small{color:var(--muted);font-size:12.5px;line-height:1.35}
+@media (max-width:640px){.scores{grid-template-columns:1fr 1fr}.score:nth-child(3){border-left:0}.score:nth-child(n+3){border-top:1px solid var(--line)}}
+.sec{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px;min-width:0}
+.sec:last-child{border-bottom:0}
+.sec h3{margin:0;font-family:var(--f-mono);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.reco{display:grid;grid-template-columns:120px minmax(0,1fr);gap:6px 16px;margin:0}
+.reco dt{font-family:var(--f-mono);font-size:12px;color:var(--muted);padding-top:2px}
+.reco dd{margin:0}
+@media (max-width:520px){.reco{grid-template-columns:1fr}.reco dd{margin-bottom:6px}}
+.steps{margin:0;padding-left:20px}
+.sig{display:grid;grid-template-columns:92px minmax(0,1fr);gap:4px 14px;padding:10px 0;border-top:1px dashed var(--line)}
+.sig:first-of-type{border-top:0}
+.sig-date{font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.sig-body{min-width:0;display:flex;flex-direction:column;gap:3px}
+.sig-body b{font-weight:600}
+.sig-body p{margin:0;color:var(--fg)}
+.sig-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tag{font-family:var(--f-mono);font-size:10.5px;border:1px solid var(--line-strong);padding:0 5px;border-radius:2px;color:var(--muted)}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.src{font-size:12.5px;word-break:break-all}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 10px 7px 0;border-top:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-top:0}
+.mail{border:1px solid var(--line);background:var(--bg);padding:14px 16px;font-size:14.5px;white-space:pre-wrap;max-width:75ch}
+.mail-subj{font-weight:600;margin-bottom:8px;white-space:normal}
+.btn{border:1px solid var(--line-strong);background:var(--panel);padding:5px 12px;border-radius:3px;cursor:pointer;font-size:13.5px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.status-row{display:flex;flex-wrap:wrap;gap:6px}
+textarea{width:100%;min-height:70px;border:1px solid var(--line-strong);background:var(--panel);border-radius:3px;padding:8px;font:inherit;resize:vertical}
+.note-foot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.facts{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+ul.plain{margin:0;padding-left:18px}
+.empty{padding:40px 22px;color:var(--muted);display:flex;flex-direction:column;gap:8px}
+.empty b{color:var(--fg);font-family:var(--f-display);font-size:18px}
+details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
+.notice{font-size:13px;color:var(--muted)}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.screened{border:1px solid var(--line);background:var(--panel)}
+.screened>details>summary{padding:11px 14px;font-family:var(--f-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.scr{padding:10px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.scr-head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.scr-head b{font-weight:600}
+.v-drop{background:var(--bad-soft);color:var(--bad)}.v-maybe{background:var(--warn-soft);color:var(--warn)}.v-deep{background:var(--good-soft);color:var(--good)}
+.scr p{margin:0;color:var(--muted)}
+.wave-h{padding:9px 12px;background:var(--bg);border-top:1px solid var(--line);font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.wave-h:first-child{border-top:0}
+.row-when{color:var(--fg);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+
+<noscript><p style="padding:16px;font:15px system-ui,sans-serif">This dashboard needs JavaScript. Open the file in a web browser (Chrome, Edge, Firefox or Safari). File previews in mail, Files or chat apps do not run it.</p></noscript>
+<div class="wrap">
+  <header class="tb">
+    <div class="tb-name">
+      <h1>Volotech Prospect Radar</h1>
+      <p>Who needs external CNC and sheet metal capacity now, who pays reliably, and whom to call.</p>
+    </div>
+    <div class="tb-cells">
+      <div class="tb-cell"><span>Researched</span><b id="k-total">0</b></div>
+      <div class="tb-cell"><span>Prio A</span><b id="k-a">0</b></div>
+      <div class="tb-cell"><span>Low risk</span><b id="k-low">0</b></div>
+      <div class="tb-cell"><span>Last run</span><b id="k-run" style="font-size:15px">–</b></div>
+    </div>
+  </header>
+
+  <div class="bar" role="toolbar" aria-label="Filters">
+    <div class="grp" id="f-view"><span>View</span><button class="chip" data-view="all" aria-pressed="true">All researched</button><button class="chip" data-view="calls" aria-pressed="false">Contact list A+B</button></div>
+    <div class="grp" id="f-prio"><span>Priority</span></div>
+    <div class="grp" id="f-risk"><span>Payment risk</span></div>
+    <div class="grp" id="f-status"><span>Status</span></div>
+    <input id="q" class="search" type="search" placeholder="Search company, region, person" aria-label="Search">
+    <div class="grp" id="static-tools" hidden>
+      <button class="chip" id="export-notes" type="button">Export notes</button>
+      <label class="chip" for="import-notes">Import notes</label>
+      <input id="import-notes" type="file" accept="application/json" hidden>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="col">
+      <nav class="list" id="list" aria-label="Prospects"></nav>
+      <section class="screened" id="screened" hidden></section>
+    </div>
+    <article class="dossier" id="dossier"></article>
+  </div>
+  <p class="notice" id="notice"></p>
+</div>
+
+<script>
+(() => {
+  const PRIO_ORDER = {A:0,B:1,C:2,X:3};
+  const RISK_ORDER = {low:0,medium:1,unknown:2,high:3};
+  const STATUSES = [
+    ["new","Not acted on"],["contact","To contact"],["contacted","Contacted"],["later","Later"],["won","Client"],["drop","Dropped"]
+  ];
+  const STATUS_LABEL = Object.fromEntries(STATUSES);
+  const state = { prospects: [], status: {}, runs: [], screening: [], sel: null, f: {prio:new Set(), risk:new Set(), status:new Set()}, q:"", view:"all" };
+  const WAVES = {1:"Wave 1 · Priority A, contact now", 2:"Wave 2 · Priority B with a current reason", 3:"Wave 3 · Priority B, no urgent reason"};
+  const wave = p => { const pr = p.recommendation?.priority; if (pr === "A") return 1; if (pr !== "B") return 0; return (p.timing_score||0) >= 5 ? 2 : 3; };
+  const firstSentence = t => { const x = String(t||"").trim(), f = x.match(/^[\s\S]*?[.!?](?=\s|$)/), m = f ? f[0] : x; return m.length > 140 ? m.slice(0,139)+"…" : m; };
+  let db = null, canWrite = true;
+
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const url = u => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
+  const link = (u, label) => { const h = url(u); return h ? `<a href="${esc(h)}" target="_blank" rel="noopener">${esc(label || new URL(h).hostname.replace(/^www\./,""))}</a>` : esc(u || ""); };
+  const statusOf = id => (state.status[id] && state.status[id].state) || "new";
+
+  function chips(el, key, items){
+    el.insertAdjacentHTML("beforeend", items.map(([v,l]) => `<button class="chip" data-k="${key}" data-v="${v}" aria-pressed="false">${esc(l)}</button>`).join(""));
+  }
+  chips($("#f-prio"), "prio", [["A","A"],["B","B"],["C","C"],["X","X"]]);
+  chips($("#f-risk"), "risk", [["low","Low"],["medium","Medium"],["high","High"],["unknown","Unknown"]]);
+  chips($("#f-status"), "status", STATUSES);
+  document.querySelector(".bar").addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    if (b.dataset.view){
+      state.view = b.dataset.view;
+      document.querySelectorAll("#f-view .chip").forEach(c => c.setAttribute("aria-pressed", c.dataset.view === state.view));
+      renderList(); return;
+    }
+    if (!b.dataset.k) return;
+    const set = state.f[b.dataset.k];
+    set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v);
+    b.setAttribute("aria-pressed", set.has(b.dataset.v));
+    renderList();
+  });
+  $("#q").addEventListener("input", e => { state.q = e.target.value.trim().toLowerCase(); renderList(); });
+
+  function visible(){
+    return state.prospects.filter(p => {
+      const pr = p.recommendation?.priority || "C", rk = p.payment_risk?.rating || "unknown";
+      if (state.view === "calls" && !wave(p)) return false;
+      if (state.f.prio.size && !state.f.prio.has(pr)) return false;
+      if (state.f.risk.size && !state.f.risk.has(rk)) return false;
+      if (state.f.status.size && !state.f.status.has(statusOf(p.id))) return false;
+      if (state.q){
+        const hay = [p.company,p.region,p.segment,...(p.contacts||[]).map(c=>c.name)].join(" ").toLowerCase();
+        if (!hay.includes(state.q)) return false;
+      }
+      return true;
+    }).sort((a,b) =>
+      (state.view === "calls" ? wave(a) - wave(b) || (b.timing_score||0) - (a.timing_score||0) || (b.fit_score||0) - (a.fit_score||0) || (RISK_ORDER[a.payment_risk?.rating] ?? 2) - (RISK_ORDER[b.payment_risk?.rating] ?? 2) : 0) ||
+      (PRIO_ORDER[a.recommendation?.priority] ?? 2) - (PRIO_ORDER[b.recommendation?.priority] ?? 2) ||
+      ((b.fit_score||0)+(b.timing_score||0)) - ((a.fit_score||0)+(a.timing_score||0)) ||
+      (RISK_ORDER[a.payment_risk?.rating] ?? 2) - (RISK_ORDER[b.payment_risk?.rating] ?? 2));
+  }
+
+  function renderKpis(){
+    $("#k-total").textContent = state.prospects.length;
+    $("#k-a").textContent = state.prospects.filter(p => p.recommendation?.priority === "A").length;
+    $("#k-low").textContent = state.prospects.filter(p => p.payment_risk?.rating === "low").length;
+    const last = state.runs.map(r => r.date).sort().pop();
+    $("#k-run").textContent = last || "–";
+  }
+
+  function renderList(){
+    const list = $("#list"), rows = visible();
+    if (!state.prospects.length){
+      list.innerHTML = `<div class="empty"><b>No prospects researched yet</b>Research runs write their results here, ten companies at a time. Ask Claude to run the next batch from the CRM list.</div>`;
+      return;
+    }
+    if (!rows.length){ list.innerHTML = `<div class="empty"><b>No match</b>Clear a filter to see more prospects.</div>`; return; }
+    const calls = state.view === "calls";
+    let lastWave = 0, n = 0;
+    list.innerHTML = rows.map(p => {
+      const w = wave(p), head = calls && w !== lastWave ? `<div class="wave-h">${esc(WAVES[w])} · ${rows.filter(x => wave(x) === w).length}</div>` : "";
+      lastWave = w; n++;
+      const pr = p.recommendation?.priority || "C", rk = p.payment_risk?.rating || "unknown", st = statusOf(p.id);
+      return head + `<button class="row" data-id="${esc(p.id)}" aria-current="${p.id===state.sel}">
+        <div class="prio ${esc(pr)}" title="Priority ${esc(pr)}">${esc(pr)}</div>
+        <div class="row-main"><b>${calls ? n + ". " : ""}${esc(p.company)}</b><small>${esc(p.region)} · ${esc(p.segment)}${p.employees ? " · "+esc(p.employees) : ""}</small>${calls && p.recommendation?.timing ? `<span class="row-when">${esc(firstSentence(p.recommendation.timing))}</span>` : ""}</div>
+        <div class="row-side">
+          <div class="meters">
+            <span class="meter" title="Fit ${p.fit_score}/10">fit<i style="--v:${(p.fit_score||0)*10}%"></i></span>
+            <span class="meter" title="Timing ${p.timing_score}/10">now<i style="--v:${(p.timing_score||0)*10}%"></i></span>
+          </div>
+          <div style="display:flex;gap:4px"><span class="pill r-${esc(rk)}">risk ${esc(rk)}</span><span class="pill s-${esc(st)}">${esc(STATUS_LABEL[st])}</span></div>
+        </div>
+      </button>`;
+    }).join("");
+  }
+  $("#list").addEventListener("click", e => {
+    const r = e.target.closest(".row"); if (!r) return;
+    select(r.dataset.id, true);
+  });
+
+  function select(id, scroll){
+    state.sel = id;
+    try { history.replaceState(null, "", "#" + id); } catch {}
+    renderList(); renderDossier();
+    if (scroll && window.matchMedia("(max-width:900px)").matches) $("#dossier").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  function renderDossier(){
+    const el = $("#dossier");
+    const p = state.prospects.find(x => x.id === state.sel);
+    if (!p){
+      el.innerHTML = `<div class="empty"><b>Pick a prospect</b>The dossier shows why now, payment risk, whom to contact and a follow-up draft, with a source for every claim.</div>`;
+      return;
+    }
+    const r = p.recommendation || {}, pr = p.payment_risk || {}, st = statusOf(p.id), sv = state.status[p.id] || {};
+    const sigs = [...(p.signals||[])].sort((a,b) => String(b.date).localeCompare(String(a.date)));
+    el.innerHTML = `
+      <div class="d-head">
+        <div class="d-meta"><span class="prio ${esc(r.priority)}" style="font-size:15px">Priority ${esc(r.priority||"–")}</span>${wave(p) ? `<span>${esc(WAVES[wave(p)].split(" · ")[0])}</span>` : ""}<span>${esc(p.region)}</span><span>${esc(p.segment)}</span>${p.website ? `<span>${link(p.website.startsWith("http")?p.website:"https://"+p.website)}</span>` : ""}<span>Researched ${esc(p.researched_at||"")}</span></div>
+        <h2>${esc(p.company)}</h2>
+        <p class="d-summary">${esc(p.summary)}</p>
+        <div class="d-meta"><span>Employees: ${esc(p.employees||"–")}</span><span>Founded: ${esc(p.founded||"–")}</span><span>Ownership: ${esc(p.ownership||"–")}</span></div>
+      </div>
+      <div class="scores">
+        <div class="score"><span>Fit</span><b>${esc(p.fit_score)}/10</b><small>${esc(p.fit_reasoning)}</small></div>
+        <div class="score"><span>Timing</span><b>${esc(p.timing_score)}/10</b><small>${esc(p.timing_reasoning)}</small></div>
+        <div class="score"><span>Payment risk</span><b><span class="pill r-${esc(pr.rating||"unknown")}" style="font-size:14px">${esc(pr.rating||"unknown")}</span></b><small>${esc(pr.reasoning)}</small></div>
+        <div class="score"><span>Own CNC</span><b style="font-size:18px">${esc(p.in_house_manufacturing?.level||"–")}</b><small>${esc(p.in_house_manufacturing?.details)} ${p.in_house_manufacturing?.source ? link(p.in_house_manufacturing.source,"source") : ""}</small></div>
+      </div>
+
+      <section class="sec">
+        <h3>Status</h3>
+        <div class="status-row" id="st-btns">${STATUSES.map(([v,l]) => `<button class="btn" data-st="${v}" aria-pressed="${v===st}" ${canWrite?"":"disabled"}>${esc(l)}</button>`).join("")}</div>
+        <textarea id="note-${esc(p.id)}" placeholder="Your notes: call outcome, who you spoke to, next step" ${canWrite?"":"disabled"}>${esc(sv.note||"")}</textarea>
+        <div class="note-foot"><button class="btn primary" id="save-note" ${canWrite?"":"disabled"}>Save note</button><span id="note-msg">${sv.updated ? "Last saved " + esc(new Date(sv.updated).toLocaleString()) : ""}</span></div>
+      </section>
+
+      <section class="sec">
+        <h3>Recommendation</h3>
+        <dl class="reco">
+          <dt>Contact first</dt><dd>${esc(r.contact_first)}</dd>
+          <dt>Channel</dt><dd>${esc(r.channel)}</dd>
+          <dt>Angle</dt><dd>${esc(r.angle)}</dd>
+          <dt>Timing</dt><dd>${esc(r.timing)}</dd>
+          <dt>Safeguards</dt><dd>${esc(r.safeguards)}</dd>
+        </dl>
+        ${(r.next_steps||[]).length ? `<ol class="steps">${r.next_steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>` : ""}
+      </section>
+
+      <section class="sec">
+        <h3>Signals (${sigs.length})</h3>
+        ${sigs.length ? sigs.map(s => `<div class="sig">
+          <div class="sig-date">${esc(s.date)}<span class="${s.polarity==="negative"?"neg":"pos"}">${s.polarity==="negative"?"▼ negative":"▲ positive"}</span></div>
+          <div class="sig-body"><b>${esc(s.title)}</b><p>${esc(s.detail)}</p>
+            <div class="sig-tags"><span class="tag">${esc(s.type)}</span><span class="tag">${esc(s.strength)}</span>${s.source?`<span class="src">${link(s.source)}</span>`:""}</div></div>
+        </div>`).join("") : `<p class="notice">No timing signals found.</p>`}
+      </section>
+
+      <section class="sec">
+        <h3>Contacts</h3>
+        ${(p.contacts||[]).length ? `<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Email / phone</th><th>Why</th></tr></thead><tbody>
+          ${p.contacts.map(c=>`<tr><td>${esc(c.name)}${c.linkedin?`<br>${link(c.linkedin,"profile")}`:""}</td><td>${esc(c.role)}</td><td style="word-break:break-all">${esc(c.email)}${c.phone?`<br>${esc(c.phone)}`:""}</td><td>${esc(c.notes)} ${c.source?link(c.source,"source"):""}</td></tr>`).join("")}
+        </tbody></table></div>` : `<p class="notice">No named contacts found.</p>`}
+      </section>
+
+      <section class="sec">
+        <h3>Follow-up draft</h3>
+        ${p.email_draft?.body ? `<div class="mail"><div class="mail-subj">Betreff: ${esc(p.email_draft.subject)}</div>${esc(p.email_draft.body)}</div>
+        <div><button class="btn" id="copy-mail">Copy email</button> <span class="notice" id="copy-msg"></span></div>` : `<p class="notice">No draft.</p>`}
+      </section>
+
+      <section class="sec">
+        <h3>Financial facts</h3>
+        ${(pr.facts||[]).length ? `<ul class="facts">${pr.facts.map(f=>`<li>${esc(f.fact)} <span class="notice">${esc(f.date||"")}</span> ${f.source?link(f.source,"source"):""}</li>`).join("")}</ul>` : `<p class="notice">No published figures found.</p>`}
+      </section>
+
+      <section class="sec">
+        <h3>Verify before contacting</h3>
+        ${(p.open_questions||[]).length ? `<ul class="plain">${p.open_questions.map(q=>`<li>${esc(q)}</li>`).join("")}</ul>` : `<p class="notice">Nothing open.</p>`}
+        <details><summary>All sources (${(p.sources||[]).length})</summary><ul class="plain">${(p.sources||[]).map(s=>`<li class="src">${link(s, s)}</li>`).join("")}</ul></details>
+      </section>`;
+
+    el.querySelector("#st-btns").addEventListener("click", async e => {
+      const b = e.target.closest("[data-st]"); if (!b) return;
+      await saveStatus(p.id, { state: b.dataset.st });
+    });
+    el.querySelector("#save-note").addEventListener("click", async () => {
+      await saveStatus(p.id, { note: el.querySelector("textarea").value });
+    });
+    const cp = el.querySelector("#copy-mail");
+    if (cp) cp.addEventListener("click", async () => {
+      const text = `Betreff: ${p.email_draft.subject}\n\n${p.email_draft.body}`;
+      try { await navigator.clipboard.writeText(text); $("#copy-msg").textContent = "Copied"; }
+      catch { const r = document.createRange(); r.selectNodeContents(el.querySelector(".mail")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("#copy-msg").textContent = "Selected, press Ctrl+C"; }
+    });
+  }
+
+  function renderScreened(){
+    const el = $("#screened");
+    const researched = new Set(state.prospects.map(p => p.id));
+    const rows = state.screening.filter(s => !researched.has(s.id))
+      .sort((a,b) => ({maybe:0,deep:1,drop:2}[a.verdict] ?? 3) - ({maybe:0,deep:1,drop:2}[b.verdict] ?? 3) || (a.crm_row||0) - (b.crm_row||0));
+    el.hidden = !rows.length;
+    if (!rows.length) { el.innerHTML = ""; return; }
+    const open = el.querySelector("details")?.open ? " open" : "";
+    el.innerHTML = `<details${open}><summary>Screened, not researched (${rows.length})</summary>
+      ${rows.map(s => `<div class="scr">
+        <div class="scr-head"><span class="pill v-${esc(s.verdict)}">${esc(s.verdict)}</span><b>${esc(s.company)}</b><span class="notice">row ${esc(s.crm_row)} · own CNC: ${esc(s.own_cnc)}</span></div>
+        <p>${esc(s.reason)}</p>
+        ${s.signal ? `<p>Signal: ${esc(s.signal)}</p>` : ""}
+        ${s.contact ? `<p>Contact: ${esc(s.contact)}</p>` : ""}
+        ${(s.sources||[]).length ? `<p class="src">${s.sources.slice(0,4).map(u => link(u)).join(" · ")}</p>` : ""}
+      </div>`).join("")}</details>`;
+  }
+
+  // Standalone build: research data is embedded as window.PROSPECT_DATA, and status/notes live in this browser.
+  const STATIC = !!window.PROSPECT_DATA;
+  const LS_KEY = "volotech-prospect-status";
+  function lsRead(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch { return {}; } }
+  function lsWrite(v){ try { localStorage.setItem(LS_KEY, JSON.stringify(v)); return true; } catch { return false; } }
+
+  let saving = false;
+  async function saveStatus(id, patch){
+    if ((!db && !STATIC) || saving) return;
+    saving = true;
+    const cur = state.status[id] || {};
+    const next = { state: cur.state || "new", note: cur.note || "", ...patch, updated: new Date().toISOString() };
+    if (STATIC){
+      state.status = { ...state.status, [id]: next };
+      if (!lsWrite(state.status)) { const m = $("#note-msg"); if (m) m.textContent = "This browser blocks local storage, so notes are not kept."; }
+      renderList(); renderDossier();
+      saving = false; return;
+    }
+    try { await db.doc("status/" + id).set(next); }
+    catch (e) {
+      const m = $("#note-msg"); if (m) m.textContent = e && e.code === "invalid_argument" ? "You can view this page but not change it." : "Not saved. Try again in a moment.";
+      if (e && e.code === "invalid_argument") { canWrite = false; renderDossier(); }
+    }
+    saving = false;
+  }
+
+  renderKpis(); renderList(); renderDossier();
+
+  if (STATIC){
+    const D = window.PROSPECT_DATA;
+    state.prospects = D.prospects || []; state.screening = D.screening || []; state.runs = D.runs || [];
+    state.status = { ...(D.status || {}), ...lsRead() };
+    const h = (location.hash||"").slice(1);
+    state.sel = state.prospects.some(p=>p.id===h) ? h : (visible()[0]?.id ?? null);
+    renderKpis(); renderList(); renderDossier(); renderScreened();
+    $("#notice").textContent = `Snapshot exported ${D.exported_at || ""}. Status and notes are saved in this browser only; use Export notes to move them to another device.`;
+    const tools = $("#static-tools"); tools.hidden = false;
+    $("#export-notes").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(state.status, null, 2)], {type: "application/json"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = "volotech-prospect-notes-" + new Date().toISOString().slice(0,10) + ".json"; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+    $("#import-notes").addEventListener("change", async e => {
+      const f = e.target.files[0]; if (!f) return;
+      try { const v = JSON.parse(await f.text()); state.status = { ...state.status, ...v }; lsWrite(state.status); renderList(); renderDossier(); $("#notice").textContent = "Notes imported."; }
+      catch { $("#notice").textContent = "That file is not a notes export from this dashboard."; }
+      e.target.value = "";
+    });
+    return;
+  }
+
+  (async () => {
+    db = await (window.claude?.use ? window.claude.use("db") : null);
+    if (!db){ $("#notice").textContent = "The research database is not available in this view. Open the page on claude.ai while signed in."; return; }
+    db.collection("prospects").onSnapshot(s => {
+      state.prospects = s.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (!state.sel){
+        const h = (location.hash||"").slice(1);
+        state.sel = state.prospects.some(p=>p.id===h) ? h : (visible()[0]?.id ?? null);
+      }
+      renderKpis(); renderList(); renderDossier(); renderScreened();
+    }, () => { $("#notice").textContent = "Lost connection to the research database. Reload the page."; });
+    db.collection("status").onSnapshot(s => {
+      state.status = Object.fromEntries(s.docs.map(d => [d.id, d.data()]));
+      renderList();
+      const ta = document.activeElement && document.activeElement.tagName === "TEXTAREA";
+      if (!ta) renderDossier();
+    }, () => {});
+    db.collection("screening").onSnapshot(s => { state.screening = s.docs.map(d => ({ id: d.id, ...d.data() })); renderScreened(); }, () => {});
+    db.collection("runs").onSnapshot(s => { state.runs = s.docs.map(d => d.data()); renderKpis(); }, () => {});
+  })();
+})();
+</script>
