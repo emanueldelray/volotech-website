@@ -243,6 +243,7 @@
         hasQuestions: !!a.questions,
         onSaved: function (qs) {
           a.questions = qs;
+          a.questionsAt = Date.now();
           APP.store.save();
           U.toast(qs.length + ' Fragen gespeichert.');
           APP.navigate('#/lesen/artikel/' + encodeURIComponent(a.id));
@@ -292,6 +293,7 @@
         type: 'button', class: 'btn bad', onclick: function () {
           if (!window.confirm('Artikel „' + a.title + '“ löschen? Gespeicherte Karten bleiben erhalten.')) return;
           R().articles = R().articles.filter(function (x) { return x.id !== a.id; });
+          APP.sync.tombstone('article', a.id);
           APP.store.save();
           APP.navigate('#/lesen');
         }

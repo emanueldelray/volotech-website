@@ -35,6 +35,10 @@
       // Lesen: eingefügte Artikel mit Fragen; Hören: Hörtexte (Audio-Dateien liegen in IndexedDB)
       reading: { articles: [] },
       listening: { entries: [] },
+      // Lernzeit anderer Geräte (aus Abgleichen): { geräteId: { tag: { modul: sek } } }
+      deviceTime: {},
+      // Löschmarken für den Abgleich: { 'text:id': ts, 'article:id': ts, … }
+      deleted: {},
       meta: { lastBackup: null }
     };
   }
@@ -44,7 +48,8 @@
     Object.keys(base).forEach(function (k) {
       if (data[k] === undefined) data[k] = base[k];
       else if (base[k] && typeof base[k] === 'object' && !Array.isArray(base[k]) &&
-               k !== 'topics' && k !== 'srs' && k !== 'time' && k !== 'verified' && k !== 'content') {
+               k !== 'topics' && k !== 'srs' && k !== 'time' && k !== 'verified' && k !== 'content' &&
+               k !== 'deviceTime' && k !== 'deleted') {
         Object.keys(base[k]).forEach(function (kk) {
           if (data[k][kk] === undefined) data[k][kk] = base[k][kk];
         });
@@ -63,6 +68,7 @@
       console.error('Laden fehlgeschlagen', e);
       state = defaults();
     }
+    APP.sync.ensureDevice(state);
     return state;
   }
 
@@ -90,6 +96,20 @@
     }
   }
 
+  /** Nach einem Abgleich: pro Thema nur die letzten N Versuche behalten */
+  function trimAttempts(st) {
+    var counts = {}, keep = [];
+    for (var i = st.attempts.length - 1; i >= 0; i--) {
+      var x = st.attempts[i], k = x.m + ':' + x.t;
+      counts[k] = (counts[k] || 0) + 1;
+      if (counts[k] <= MAX_ATTEMPTS_PER_TOPIC) keep.push(x);
+    }
+    st.attempts = keep.reverse();
+  }
+
+  /** Fremden Zustand auf das aktuelle Format bringen */
+  function normalize(data) { return merge(defaults(), data); }
+
   function exportJSON() {
     state.meta.lastBackup = Date.now();
     save();
@@ -100,6 +120,11 @@
   /** Gibt null bei Erfolg zurück, sonst eine Fehlermeldung. */
   function validateImport(text) {
     var obj;
+    if (/^\s*</.test(text)) {
+      var m = text.match(/<script[^>]*id="deutschc2-embedded"[^>]*>([\s\S]*?)<\/script>/);
+      if (!m) return { error: 'Diese HTML-Datei enthält keinen Lernstand. Bitte eine mit „App + Lernstand“ exportierte Datei wählen.' };
+      text = m[1];
+    }
     try { obj = JSON.parse(text); } catch (e) { return { error: 'Die Datei ist kein gültiges JSON: ' + e.message }; }
     if (!obj || obj.app !== 'deutsch-c2' || !obj.data) {
       return { error: 'Die Datei ist keine Sicherung dieser App (Feld "app" fehlt oder ist falsch).' };
@@ -112,16 +137,40 @@
     });
     if (typeof d.version === 'number' && d.version > VERSION) problems.push('Sicherung stammt aus einer neueren App-Version (' + d.version + ')');
     if (problems.length) return { error: 'Sicherung unvollständig: ' + problems.join(', ') + '.' };
-    return { data: d, exportedAt: obj.exportedAt };
+    return { data: d, exportedAt: obj.exportedAt, exportId: obj.exportId || null };
   }
 
+  /** Lernstand vollständig ersetzen; dieses Gerät behält seine Kennung, Zeiten bleiben pro Gerät getrennt. */
   function replaceState(data) {
-    state = merge(defaults(), data);
+    var me = { id: state.meta.deviceId, name: state.meta.deviceName };
+    var next = merge(defaults(), data);
+    var rid = next.meta.deviceId;
+    if (rid && rid !== me.id) {
+      next.deviceTime = next.deviceTime || {};
+      next.deviceTime[rid] = next.time;
+      next.time = next.deviceTime[me.id] || {};
+      delete next.deviceTime[me.id];
+    }
+    next.meta.deviceId = me.id;
+    next.meta.deviceName = me.name;
+    state = next;
+    APP.sync.ensureDevice(state);
     save();
   }
 
+  /** Fremden Lernstand einarbeiten; gibt die Zusammenfassung zurück */
+  function mergeIn(data) {
+    var sum = APP.sync.mergeStates(state, data);
+    save();
+    return sum;
+  }
+
   function reset() {
+    var me = { id: state.meta.deviceId, name: state.meta.deviceName };
     state = defaults();
+    state.meta.deviceId = me.id;
+    state.meta.deviceName = me.name;
+    APP.sync.ensureDevice(state);
     save();
   }
 
@@ -132,6 +181,7 @@
   APP.store = {
     load: load, save: save, get state() { return state; },
     addAttempt: addAttempt, exportJSON: exportJSON, validateImport: validateImport,
-    replaceState: replaceState, reset: reset, sizeKB: sizeKB
+    replaceState: replaceState, mergeIn: mergeIn, reset: reset, sizeKB: sizeKB,
+    trimAttempts: trimAttempts, normalize: normalize
   };
 })(window.APP);

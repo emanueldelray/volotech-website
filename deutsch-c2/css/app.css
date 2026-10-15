@@ -429,3 +429,11 @@ ins { color: var(--ok); text-decoration: none; font-weight: 600; }
   .selbar-text { flex-basis: 100%; white-space: normal; }
   .selbar .btn.primary { flex: 1; }
 }
+
+/* ---------- Abgleich ---------- */
+.export-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: .6rem 0; }
+.export-option .btn { width: 100%; }
+.export-option p { margin-top: .4rem; }
+.sync-card { border-color: var(--accent); }
+.field input[type=text] { width: 12rem; }
+@media (max-width: 520px) { .export-options { grid-template-columns: 1fr; } .field { flex-direction: column; align-items: stretch; } .field input[type=text] { width: 100%; } }

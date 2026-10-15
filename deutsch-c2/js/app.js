@@ -102,6 +102,7 @@
   };
 
   APP.start = function () {
+    APP.sync.captureSource();
     APP.store.load();
     APP.progress.syncSrs();
     APP.store.save();

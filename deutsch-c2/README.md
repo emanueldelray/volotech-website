@@ -87,8 +87,32 @@ werden. Schema: siehe [SCHEMAS.md](SCHEMAS.md).
 ## Daten
 
 Alles liegt in `localStorage` (Schlüssel `deutschC2.state`) – also nur in diesem
-Browser, an diesem Speicherort. Unter **Daten** gibt es Export/Import als eine
-JSON-Datei; das Datum der letzten Sicherung steht auf dem Dashboard.
+Browser, an diesem Speicherort. Unter **Daten** gibt es Export/Import; das Datum
+der letzten Sicherung steht auf dem Dashboard.
+
+### Mehrere Geräte (z. B. Handy und Laptop)
+
+Es gibt keinen Server, daher keinen automatischen Abgleich – aber einen
+verlustfreien manuellen:
+
+1. Auf Gerät A unter **Daten → Exportieren** wählen:
+   - **App + Lernstand als eine Datei** (nur in der Einzeldatei-Version):
+     eine HTML-Datei mit App und Lernstand. Auf Gerät B öffnen → die Startseite
+     bietet „Zusammenführen“ an.
+   - **Nur Lernstand (JSON)**: kleine Datei, wenn die App auf Gerät B schon da ist.
+2. Datei übertragen (AirDrop, Cloud-Ordner, E-Mail an sich selbst, Messenger).
+3. Auf Gerät B **Zusammenführen** (empfohlen) oder **Ersetzen** wählen. Beide
+   Dateiarten lassen sich auch unter **Daten → Importieren** einlesen.
+
+Zusammenführen kombiniert beide Stände: Antworten, beherrschte Themen, Texte,
+Artikel, Hörtexte, eigene Karten und Importe werden vereinigt; bei
+Wiederholungskarten gewinnt die zuletzt geübte Fassung; Löschungen werden
+übernommen; neuere Einstellungen gewinnen (Wiedergabegeschwindigkeit bleibt pro
+Gerät). Lernzeit wird pro Gerät gespeichert und nie doppelt gezählt – mehrfaches
+Zusammenführen derselben Datei ändert nichts. Lokale Audiodateien (Hören) werden
+nicht übertragen.
+
+Die Einzeldatei erzeugt `python3 tools/einzeldatei.py` (optional).
 
 Hinweis: Einige Browser trennen den `localStorage` von `file://`-Seiten nach Pfad.
 Verschieben Sie den Ordner, vorher exportieren und danach importieren.

@@ -23,6 +23,7 @@
     var c = typeof correct === 'number' ? Math.max(0, Math.min(1, correct)) : correct ? 1 : 0;
     APP.store.addAttempt({
       m: moduleId, t: topicId, i: itemId, c: c,
+      u: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
       d: U.dayStr(), ts: Date.now(), r: opts.review ? 1 : 0
     });
     var result = { mastered: false };
@@ -113,7 +114,7 @@
   }
 
   function maintenanceBudget() {
-    var day = S().time[U.dayStr()] || {};
+    var day = APP.sync.timeOfDay(U.dayStr());
     var cap = S().settings.maintenanceMinutes * 60;
     return { cap: cap, done: day._wartung || 0, left: Math.max(0, cap - (day._wartung || 0)) };
   }
@@ -138,7 +139,7 @@
   }
 
   function dayTotal(day) {
-    var t = S().time[day] || {};
+    var t = APP.sync.timeOfDay(day);
     return Object.keys(t).reduce(function (s, k) { return k.charAt(0) === '_' ? s : s + t[k]; }, 0);
   }
 
@@ -155,7 +156,7 @@
   function timeByModule(nDays) {
     var out = {};
     U.lastNDays(nDays).forEach(function (d) {
-      var t = S().time[d] || {};
+      var t = APP.sync.timeOfDay(d);
       Object.keys(t).forEach(function (k) {
         if (k.charAt(0) !== '_') out[k] = (out[k] || 0) + t[k];
       });

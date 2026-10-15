@@ -354,6 +354,7 @@
         hasQuestions: !!e.questions,
         onSaved: function (qs) {
           e.questions = qs;
+          e.questionsAt = Date.now();
           APP.store.save();
           U.toast(qs.length + ' Fragen gespeichert.');
           APP.navigate('#/hoeren/eintrag/' + encodeURIComponent(e.id));
@@ -387,6 +388,7 @@
         type: 'button', class: 'btn bad', onclick: function () {
           if (!window.confirm('Hörtext „' + e.title + '“ löschen?')) return;
           L().entries = L().entries.filter(function (x) { return x.id !== e.id; });
+          APP.sync.tombstone('entry', e.id);
           delAudio(e.id);
           APP.store.save();
           APP.navigate('#/hoeren');

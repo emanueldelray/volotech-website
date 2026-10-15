@@ -590,6 +590,7 @@
       var o = own();
       if (newDeck) o.decks.push(newDeck);
       if (deckId === targetDeck.id && !decks().some(function (d) { return d.id === targetDeck.id; })) o.decks.push(targetDeck);
+      data.updatedAt = Date.now();
       if (isSeed) {
         o.overrides[existing.id] = data;
       } else if (existing) {
@@ -631,6 +632,7 @@
             if (!window.confirm('Karte „' + existing.term + '“ löschen?')) return;
             var o = own();
             o.cards = o.cards.filter(function (c) { return c.id !== existing.id; });
+            APP.sync.tombstone('card', existing.id);
             KINDS.forEach(function (k) { delete S().srs[srsKey(existing.id + '#' + k)]; });
             APP.store.save();
             U.toast('Karte gelöscht.');

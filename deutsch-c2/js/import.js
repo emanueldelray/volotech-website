@@ -231,7 +231,7 @@
       var p = fragenTarget.split(':');
       var list = p[0] === 'lesen' ? APP.store.state.reading.articles : APP.store.state.listening.entries;
       var target = list.filter(function (x) { return x.id === p[1]; })[0];
-      if (target) target.questions = plan.fragen;
+      if (target) { target.questions = plan.fragen; target.questionsAt = Date.now(); }
     }
     APP.progress.syncSrs();
     APP.store.save();

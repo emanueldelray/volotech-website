@@ -43,6 +43,7 @@
       id: 'focus-select', 'aria-label': 'Fokusmodul wählen',
       onchange: function (e) {
         state.settings.focus = e.target.value;
+        APP.sync.touchSettings();
         APP.store.save();
         APP.navigate('#/');
       }
@@ -139,7 +140,7 @@
     var dmax = Math.max.apply(null, daily.concat([60]));
     var cols = h('div', { class: 'cols', 'aria-label': 'Lernminuten pro Tag, letzte 30 Tage' });
     days.forEach(function (d, i) {
-      var t = APP.store.state.time[d] || {};
+      var t = APP.sync.timeOfDay(d);
       var parts = APP.MODULE_META.filter(function (m) { return t[m.id]; })
         .map(function (m) { return m.title + ' ' + Math.round(t[m.id] / 60); }).join(', ');
       var label = U.fmtDate(U.parseDay(d)) + ': ' + Math.round(daily[i] / 60) + ' Min.' + (parts ? ' (' + parts + ')' : '');
@@ -162,6 +163,18 @@
     el.appendChild(h('header', { class: 'page-head' },
       h('h1', null, 'Deutsch C2'),
       h('p', { class: 'muted' }, 'Orientierung: Goethe-Zertifikat C2 (GDS)')));
+
+    // Diese Datei bringt einen Lernstand von einem anderen Gerät mit
+    var embed = APP.sync.pendingEmbed();
+    if (embed) {
+      var box = h('section', { class: 'card sync-card' },
+        h('h2', null, 'Lernstand in dieser Datei'),
+        APP.dataUi.mergeChoice({ data: embed.data, exportedAt: embed.exportedAt, exportId: embed.exportId }, function () {
+          APP.sync.markEmbedSeen(embed);
+          box.remove();
+        }, 'Nicht übernehmen'));
+      el.appendChild(box);
+    }
 
     el.appendChild(h('div', { class: 'tiles' },
       tile('Serie', st.days + (st.days === 1 ? ' Tag' : ' Tage'), st.todayDone ? 'heute erledigt' : 'heute noch offen'),

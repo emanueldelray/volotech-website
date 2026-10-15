@@ -638,6 +638,7 @@
         type: 'button', class: 'btn bad', onclick: function () {
           if (!window.confirm('Diesen Text samt Feedback löschen?')) return;
           W().submissions = W().submissions.filter(function (s) { return s.id !== sub.id; });
+          APP.sync.tombstone('text', sub.id);
           APP.progress.removeAttempts(ID, sub.id);
           APP.store.save();
           APP.navigate('#/schreiben/texte');
