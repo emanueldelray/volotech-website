@@ -128,6 +128,9 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .scr-head b{font-weight:600}
 .v-drop{background:var(--bad-soft);color:var(--bad)}.v-maybe{background:var(--warn-soft);color:var(--warn)}.v-deep{background:var(--good-soft);color:var(--good)}
 .scr p{margin:0;color:var(--muted)}
+.wave-h{padding:9px 12px;background:var(--bg);border-top:1px solid var(--line);font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.wave-h:first-child{border-top:0}
+.row-when{color:var(--fg);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 
 <div class="wrap">
@@ -145,6 +148,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   </header>
 
   <div class="bar" role="toolbar" aria-label="Filters">
+    <div class="grp" id="f-view"><span>View</span><button class="chip" data-view="all" aria-pressed="true">All researched</button><button class="chip" data-view="calls" aria-pressed="false">Contact list A+B</button></div>
     <div class="grp" id="f-prio"><span>Priority</span></div>
     <div class="grp" id="f-risk"><span>Payment risk</span></div>
     <div class="grp" id="f-status"><span>Status</span></div>
@@ -174,7 +178,10 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     ["new","Not acted on"],["contact","To contact"],["contacted","Contacted"],["later","Later"],["won","Client"],["drop","Dropped"]
   ];
   const STATUS_LABEL = Object.fromEntries(STATUSES);
-  const state = { prospects: [], status: {}, runs: [], screening: [], sel: null, f: {prio:new Set(), risk:new Set(), status:new Set()}, q:"" };
+  const state = { prospects: [], status: {}, runs: [], screening: [], sel: null, f: {prio:new Set(), risk:new Set(), status:new Set()}, q:"", view:"all" };
+  const WAVES = {1:"Wave 1 · Priority A, contact now", 2:"Wave 2 · Priority B with a current reason", 3:"Wave 3 · Priority B, no urgent reason"};
+  const wave = p => { const pr = p.recommendation?.priority; if (pr === "A") return 1; if (pr !== "B") return 0; return (p.timing_score||0) >= 5 ? 2 : 3; };
+  const firstSentence = t => { const m = String(t||"").trim().split(/(?<=[.!?])\s/)[0]; return m.length > 140 ? m.slice(0,139)+"…" : m; };
   let db = null, canWrite = true;
 
   const $ = s => document.querySelector(s);
@@ -191,6 +198,12 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   chips($("#f-status"), "status", STATUSES);
   document.querySelector(".bar").addEventListener("click", e => {
     const b = e.target.closest(".chip"); if (!b) return;
+    if (b.dataset.view){
+      state.view = b.dataset.view;
+      document.querySelectorAll("#f-view .chip").forEach(c => c.setAttribute("aria-pressed", c.dataset.view === state.view));
+      renderList(); return;
+    }
+    if (!b.dataset.k) return;
     const set = state.f[b.dataset.k];
     set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v);
     b.setAttribute("aria-pressed", set.has(b.dataset.v));
@@ -201,6 +214,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   function visible(){
     return state.prospects.filter(p => {
       const pr = p.recommendation?.priority || "C", rk = p.payment_risk?.rating || "unknown";
+      if (state.view === "calls" && !wave(p)) return false;
       if (state.f.prio.size && !state.f.prio.has(pr)) return false;
       if (state.f.risk.size && !state.f.risk.has(rk)) return false;
       if (state.f.status.size && !state.f.status.has(statusOf(p.id))) return false;
@@ -210,6 +224,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
       }
       return true;
     }).sort((a,b) =>
+      (state.view === "calls" ? wave(a) - wave(b) || (b.timing_score||0) - (a.timing_score||0) || (b.fit_score||0) - (a.fit_score||0) || (RISK_ORDER[a.payment_risk?.rating] ?? 2) - (RISK_ORDER[b.payment_risk?.rating] ?? 2) : 0) ||
       (PRIO_ORDER[a.recommendation?.priority] ?? 2) - (PRIO_ORDER[b.recommendation?.priority] ?? 2) ||
       ((b.fit_score||0)+(b.timing_score||0)) - ((a.fit_score||0)+(a.timing_score||0)) ||
       (RISK_ORDER[a.payment_risk?.rating] ?? 2) - (RISK_ORDER[b.payment_risk?.rating] ?? 2));
@@ -230,11 +245,15 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
       return;
     }
     if (!rows.length){ list.innerHTML = `<div class="empty"><b>No match</b>Clear a filter to see more prospects.</div>`; return; }
+    const calls = state.view === "calls";
+    let lastWave = 0, n = 0;
     list.innerHTML = rows.map(p => {
+      const w = wave(p), head = calls && w !== lastWave ? `<div class="wave-h">${esc(WAVES[w])} · ${rows.filter(x => wave(x) === w).length}</div>` : "";
+      lastWave = w; n++;
       const pr = p.recommendation?.priority || "C", rk = p.payment_risk?.rating || "unknown", st = statusOf(p.id);
-      return `<button class="row" data-id="${esc(p.id)}" aria-current="${p.id===state.sel}">
+      return head + `<button class="row" data-id="${esc(p.id)}" aria-current="${p.id===state.sel}">
         <div class="prio ${esc(pr)}" title="Priority ${esc(pr)}">${esc(pr)}</div>
-        <div class="row-main"><b>${esc(p.company)}</b><small>${esc(p.region)} · ${esc(p.segment)}${p.employees ? " · "+esc(p.employees) : ""}</small></div>
+        <div class="row-main"><b>${calls ? n + ". " : ""}${esc(p.company)}</b><small>${esc(p.region)} · ${esc(p.segment)}${p.employees ? " · "+esc(p.employees) : ""}</small>${calls && p.recommendation?.timing ? `<span class="row-when">${esc(firstSentence(p.recommendation.timing))}</span>` : ""}</div>
         <div class="row-side">
           <div class="meters">
             <span class="meter" title="Fit ${p.fit_score}/10">fit<i style="--v:${(p.fit_score||0)*10}%"></i></span>
@@ -268,7 +287,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     const sigs = [...(p.signals||[])].sort((a,b) => String(b.date).localeCompare(String(a.date)));
     el.innerHTML = `
       <div class="d-head">
-        <div class="d-meta"><span class="prio ${esc(r.priority)}" style="font-size:15px">Priority ${esc(r.priority||"–")}</span><span>${esc(p.region)}</span><span>${esc(p.segment)}</span>${p.website ? `<span>${link(p.website.startsWith("http")?p.website:"https://"+p.website)}</span>` : ""}<span>Researched ${esc(p.researched_at||"")}</span></div>
+        <div class="d-meta"><span class="prio ${esc(r.priority)}" style="font-size:15px">Priority ${esc(r.priority||"–")}</span>${wave(p) ? `<span>${esc(WAVES[wave(p)].split(" · ")[0])}</span>` : ""}<span>${esc(p.region)}</span><span>${esc(p.segment)}</span>${p.website ? `<span>${link(p.website.startsWith("http")?p.website:"https://"+p.website)}</span>` : ""}<span>Researched ${esc(p.researched_at||"")}</span></div>
         <h2>${esc(p.company)}</h2>
         <p class="d-summary">${esc(p.summary)}</p>
         <div class="d-meta"><span>Employees: ${esc(p.employees||"–")}</span><span>Founded: ${esc(p.founded||"–")}</span><span>Ownership: ${esc(p.ownership||"–")}</span></div>
