@@ -13,13 +13,17 @@ NEGATIVE = re.compile(
     r"media ?markt|saturn|expert\b|euronics|hausgeräte|hausgeraete|haushaltsgeräte|kundendienst|"
     r"elektromotoren|motoren|fahrrad|e-?bike|roller|auto(haus)?\b|kfz|kraftfahrzeug|fahrzeug|"
     r"ingenieurbüro|ingenieurbuero|planungsbüro|\bibh\b|stromspeicher discount|1komma5|enpal|zolar|"
-    r"medizin|kälte(?!.*elektro)|schrott|recycling|reparatur.?service|handy|smartphone|telekom|vodafone|o2\b|"
+    r"kundend|großh|grosshdl|fachgroß|großhdl|datentechnik|ingenieur|baugruppen|electronic assembly|klangverw|medizin|kälte(?!.*elektro)|schrott|recycling|reparatur.?service|handy|smartphone|telekom|vodafone|o2\b|"
     r"leuchtsysteme|lampen|leuchten|beleuchtung handel|zweirad|apotheke|schule|verein|stadtwerke|"
     r"bayernwerk|swm\b|lew\b|netze|umspann|kraftwerk|bahn|klinik|rewe|edeka|bauhaus|obi\b|hornbach|"
     r"sonepar|rexel|zajadacz|hagemeyer|ffl\b|würth|wuerth|conrad|reichelt|elektro ?maier großhandel|"
     r"spie\b|cegelec|imtech|caverion|bilfinger|yit\b|engie|equans|vinci|actemium|omexom|elektro-?bau ag",
     re.I)
-TRUSTED_CATS = re.compile(r"elektr|gebäudetechnik|smart", re.I)
+TRUSTED_CATS = re.compile(r"elektroinstall|elektriker|elektrotechnik|elektromeister|elektroanlagen", re.I)
+STRICT = re.compile(r"elektr|electric|e-technik|\belt\b|knx", re.I)
+SHK = re.compile(r"sanitär|sanitaer|heizung|haustechnik|klima|lüftung|kälte|kaelte|solartechnik|immobilien|makler|"
+                 r"autoelektrik|elektrohandel|einzelhandel|second hand|ton\s*\+|veranstaltung|sonnenschutz|rolll?aden|"
+                 r"maschinenbau|plasma|messtechnik|antennen|sat-|blitzschutz(?!.*elektr)", re.I)
 
 
 def relevant(r, extra):
@@ -33,16 +37,19 @@ def relevant(r, extra):
         if extra.get("craft") == "electrician":
             return True
         return bool(re.search(r"elektr|electric", name, re.I)) and extra.get("shop") in (None, "electrical", "trade", "yes")
+    shk = SHK.search(name) and not re.search(r"elektr|electric", name, re.I)
     if src == "dasoertliche":
         if extra.get("keyword") in ("Elektriker", "Elektromeister"):
-            return True
-        return bool(POSITIVE.search(name))
+            return not shk
+        return bool(STRICT.search(name)) and not SHK.search(name)
     if src == "gelbeseiten":
         cat = extra.get("category") or ""
-        if re.search(r"elektronik|haushalt|großhandel|computer|fernseh", cat, re.I):
+        if re.search(r"elektronik|haushalt|großhandel|computer|fernseh|sanitär|heizung|solar|ingenieur|kundendienst", cat, re.I):
             return False
-        return bool(TRUSTED_CATS.search(cat)) or bool(POSITIVE.search(name))
-    return bool(POSITIVE.search(name))
+        return (bool(TRUSTED_CATS.search(cat)) and not shk) or (bool(STRICT.search(name)) and not SHK.search(name))
+    if src == "muenchen.de":
+        return not shk
+    return bool(STRICT.search(name)) and not shk
 
 
 def main():
@@ -118,6 +125,8 @@ def main():
     for g in groups.values():
         g.sort(key=lambda r: (rank.get(r["source"], 9), r["name"] is None))
         best = g[0]
+        if not re.search(r"elektr|electric", best["name"] or "", re.I):
+            best = next((r for r in g if re.search(r"elektr|electric", r["name"] or "", re.I)), best)
         addr = next((r for r in sorted(g, key=lambda r: rank.get(r["source"], 9) if r["street"] else 99)), best)
         geo = next((r for r in g if not r.get("geo_approx")), best)
         phones, emails, webs, cats, srcs = [], [], [], [], []

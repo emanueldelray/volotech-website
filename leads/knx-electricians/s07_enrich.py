@@ -96,7 +96,8 @@ def main():
         mob = [p for p in phones if is_mobile(p["v"])]
 
         name = L["name"]
-        text_ok = ELECTRIC_WORDS.search(name) or kw.get("meister") or any(re.search(r"elektr", c or "", re.I) for c in cats) \
+        trusted = any(c in ("electrician", "Elektriker", "Elektromeister") or re.search(r"elektroinstall|elektriker", c or "", re.I) for c in cats)
+        text_ok = ELECTRIC_WORDS.search(name) or trusted \
             or (ok_site and re.search(r"elektr", (s.get("title") or "") + (s.get("meta_description") or ""), re.I))
         emp = s.get("employees") if ok_site else None
         reason = None

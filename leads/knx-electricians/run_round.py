@@ -52,8 +52,10 @@ def main(rnd):
     s06b_discover.main(rnd)
     s05_merge.main()
     s06_websites.main()
+    # growth = businesses first seen in this round (robust to filter changes between rounds)
     after = con.execute("SELECT COUNT(*) FROM business").fetchone()[0]
-    new = after - before
+    new = con.execute("SELECT COUNT(*) FROM business WHERE first_round=?", (rnd,)).fetchone()[0]
+    before = after - new
     con.execute("INSERT OR REPLACE INTO rounds VALUES (?,?,?,?)", (rnd, TODAY, after, new))
     con.commit()
     print(f"ROUND {rnd}: {before} -> {after} businesses (+{new}, {100 * new / max(before, 1):.1f} %)")
