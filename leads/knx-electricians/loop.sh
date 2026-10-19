@@ -1,7 +1,7 @@
 #!/bin/sh
 # Run collection rounds until two consecutive rounds add < 2 % new businesses.
 cd "$(dirname "$0")"
-while pgrep -f "s03_dasoertliche.py|s04_gelbeseiten.py|s04b_gs_districts.py|s06_websites.py" >/dev/null; do sleep 30; done
+while pgrep -f "^python3 (s03_dasoertliche|s04_gelbeseiten|s04b_gs_districts|s06_websites)\.py" >/dev/null; do sleep 30; done
 r=1; low=0
 while [ $r -le 6 ]; do
   python3 run_round.py $r > data/round$r.log 2>&1

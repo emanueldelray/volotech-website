@@ -3,7 +3,7 @@ state lives in data/leads.sqlite so any step can be re-run or resumed.
 
 Usage: python3 run_round.py <round>      (1 = base sources, 2+ = widening rounds)
 Stop criterion: two consecutive rounds that add < 2 % new businesses."""
-import re, sys
+import re, sys, threading
 from common import TODAY, db
 import s06b_discover, s02_osm, s03_dasoertliche, s04_gelbeseiten, s04b_gs_districts, s04c_muenchen_de, s05_merge, s06_websites
 
@@ -40,8 +40,11 @@ def main(rnd):
         extra = sub_localities(con)
         towns = [r[0] for r in con.execute("SELECT DISTINCT name FROM municipality ORDER BY dist_center")] + extra
         print(len(extra), "extra sub-localities")
+    # different hosts, so both directories can run side by side (each still rate-limited)
+    t = threading.Thread(target=s04_gelbeseiten.main, args=(rnd, gs_kw, towns))
+    t.start()
     s03_dasoertliche.main(rnd, do_kw, towns)
-    s04_gelbeseiten.main(rnd, gs_kw, towns)
+    t.join()
     if rnd == 1:
         s04b_gs_districts.main(rnd)
     s05_merge.main()
