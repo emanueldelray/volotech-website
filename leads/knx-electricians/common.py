@@ -66,7 +66,7 @@ def log_done(con, source, key, n, rnd, status="done"):
 
 
 def is_done(con, source, key):
-    return con.execute("SELECT 1 FROM source_log WHERE source=? AND key=? AND status='done'",
+    return con.execute("SELECT 1 FROM source_log WHERE source=? AND key=? AND status IN ('done','robots')",
                        (source, key)).fetchone() is not None
 
 
