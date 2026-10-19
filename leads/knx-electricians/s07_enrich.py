@@ -103,6 +103,8 @@ def main():
         reason = None
         if BIG.search(name):
             reason = "large contractor/chain"
+        elif re.search(r"sanitär|heizung|haustechnik", name, re.I) and not ELECTRIC_WORDS.search(name):
+            reason = "plumbing/heating (SHK) business"
         elif emp and emp >= 50:
             reason = f"approx. {emp} employees (>=50)"
         elif not text_ok:
