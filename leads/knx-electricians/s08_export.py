@@ -1,5 +1,5 @@
 """Write output/electricians.csv, output/electricians.xlsx and output/dashboard.html."""
-import csv, json
+import csv, json, re
 from pathlib import Path
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
@@ -80,6 +80,11 @@ def main():
     tpl = (BASE / "dashboard_template.html").read_text(encoding="utf-8")
     html = tpl.replace("/*__DATA__*/[]", json.dumps(data, ensure_ascii=False).replace("</", "<\\/")).replace("__DATE__", TODAY)
     (OUT / "dashboard.html").write_text(html, encoding="utf-8")
+    # claude.ai artifact variant: the platform supplies the document skeleton
+    art = re.sub(r"(?is)<!doctype html>\s*<html[^>]*>\s*<head>\s*<meta charset[^>]*>\s*<meta name=\"viewport\"[^>]*>\s*", "", html)
+    art = re.sub(r"(?is)</head>\s*<body>", "", art)
+    art = re.sub(r"(?is)</body>\s*</html>\s*$", "", art)
+    (OUT / "knx-partner-leads.html").write_text(art, encoding="utf-8")
     print("exported", len(leads), "leads ->", OUT)
 
 

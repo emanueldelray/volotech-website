@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KNX Partner Leads</title>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--ink:#16202c;--muted:#5d6b7a;--line:#dde2e8;--brand:#1f3a5f;--accent:#e8f0fa;
---p5:#0b7a3e;--p4:#3a8f2f;--p3:#9a7b00;--p2:#b35c00;--p1:#a12d2d;--knx:#5b3fa8}
-@media (prefers-color-scheme:dark){:root{--bg:#11161d;--card:#1a212b;--ink:#e6ebf1;--muted:#9aa7b5;--line:#2c3644;--brand:#8fb4e3;--accent:#22324a;--knx:#b39cf0}}
+:root{--bg:#f6f7f9;--card:#fff;--ink:#16202c;--muted:#5d6b7a;--line:#dde2e8;--brand:#1f3a5f;--on-brand:#fff;--accent:#e8f0fa;
+--p5:#0b7a3e;--p4:#3a8f2f;--p3:#9a7b00;--p2:#b35c00;--p1:#a12d2d;--knx:#5b3fa8;--on-prio:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11161d;--card:#1a212b;--ink:#e6ebf1;--muted:#9aa7b5;--line:#2c3644;--brand:#8fb4e3;--on-brand:#11161d;--accent:#22324a;--knx:#b39cf0;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161d;--card:#1a212b;--ink:#e6ebf1;--muted:#9aa7b5;--line:#2c3644;--brand:#8fb4e3;--on-brand:#11161d;--accent:#22324a;--knx:#b39cf0;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px}
 h1{font-size:17px;margin:0 0 6px}
 .sub{color:var(--muted);font-size:12px}
 .counters{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}
@@ -25,13 +26,12 @@ h1{font-size:17px;margin:0 0 6px}
 @media (max-width:640px){.ftoggle{display:inline-block}.filters.collapsed>*:not(.search){display:none}}
 .bar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px;align-items:center}
 .btn{width:auto;cursor:pointer;background:var(--card)}
-.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
-@media (prefers-color-scheme:dark){.btn.primary{color:#11161d}}
+.btn.primary{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
 main{padding:0 16px 40px;max-width:1100px;margin:0 auto}
 .count{color:var(--muted);font-size:13px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
 .top{display:flex;gap:10px;align-items:flex-start}
-.prio{flex:none;width:34px;height:34px;border-radius:8px;color:#fff;font-weight:700;display:grid;place-items:center}
+.prio{flex:none;width:34px;height:34px;border-radius:8px;color:var(--on-prio);font-weight:700;display:grid;place-items:center}
 .p5{background:var(--p5)}.p4{background:var(--p4)}.p3{background:var(--p3)}.p2{background:var(--p2)}.p1{background:var(--p1)}
 .name{font-weight:650;font-size:16px;word-break:break-word}
 .meta{color:var(--muted);font-size:13px}
@@ -41,8 +41,8 @@ main{padding:0 16px 40px;max-width:1100px;margin:0 auto}
 .tag.warn{color:var(--p2);border-color:var(--p2)}
 .actions{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .actions a{text-decoration:none;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);color:var(--ink);background:var(--bg);word-break:break-all}
-.actions a.call{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:600}
-@media (prefers-color-scheme:dark){.actions a.call{color:#11161d}}
+.actions a.call{background:var(--brand);color:var(--on-brand);border-color:var(--brand);font-weight:600}
+.actions .btn{padding:8px 10px}
 .rec{font-size:13px;background:var(--accent);border-radius:8px;padding:7px 9px;margin:6px 0}
 .opener{border-left:3px solid var(--brand);padding:6px 10px;margin:8px 0;font-size:14px;background:var(--bg);border-radius:0 8px 8px 0}
 .row{display:grid;grid-template-columns:1fr;gap:6px}
@@ -58,7 +58,7 @@ details a{color:var(--brand);word-break:break-all}
 <body>
 <header>
   <h1>KNX Partner Leads · Elektrobetriebe Südbayern</h1>
-  <div class="sub">Data collected __DATE__ · status &amp; notes are saved in this browser only (use “Backup” to keep them)</div>
+  <div class="sub">Data collected __DATE__ · <span id="savemode">status &amp; notes are saved in this browser (use “Backup” to keep them)</span></div>
   <div class="counters" id="counters"></div>
 </header>
 <button class="btn ftoggle" id="ftoggle">Filters ▾</button>
@@ -92,7 +92,44 @@ const STATUSES = ["not contacted","called – no answer","call back","interested
 const KEY = "knxLeads.v1";
 let store = {};
 try { store = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { store = {}; }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { toast("Could not save (storage blocked)"); } }
+function saveLocal(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+// In claude.ai the page gets a private per-account store (db); a local file keeps using localStorage.
+let remote = null, writeTimers = {}, writing = {};
+async function writeRemote(id){
+  if (!remote) return;
+  if (writing[id]) { writing[id] = "again"; return; }
+  writing[id] = true;
+  try { await remote.col.doc(id).set({ ...(store[id] || {}) }); }
+  catch (e) { toast(e && e.code === "quota_exceeded" ? "Storage full: could not save" : "Could not sync, saved on this device"); }
+  const again = writing[id] === "again"; writing[id] = false;
+  if (again) writeRemote(id);
+}
+function save(id, delay=0){
+  saveLocal();
+  if (!remote || !id) return;
+  clearTimeout(writeTimers[id]);
+  writeTimers[id] = setTimeout(() => writeRemote(id), delay);
+}
+async function initRemote(){
+  if (!window.claude || !window.claude.use) return;
+  try {
+    const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    const uid = db && user ? await user.id() : null;
+    if (!uid) return;
+    const col = db.collection("data/users/" + uid);
+    remote = { col };
+    let first = true;
+    col.onSnapshot(snap => {
+      snap.docChanges().forEach(ch => {
+        if (ch.type === "removed") { delete store[ch.doc.id]; return; }
+        const d = ch.doc.data(); if (d && !writing[ch.doc.id]) store[ch.doc.id] = { ...d };
+      });
+      saveLocal();
+      if (first) { first = false; $("savemode").textContent = "status & notes are saved to your Claude account and sync across devices"; }
+      if (!document.activeElement || !document.activeElement.classList.contains("notes")) render(); else counters();
+    }, () => { remote = null; $("savemode").textContent = "sync unavailable, status & notes are saved in this browser"; });
+  } catch (e) { remote = null; }
+}
 const st = id => (store[id] && store[id].status) || "not contacted";
 const notes = id => (store[id] && store[id].notes) || "";
 const $ = id => document.getElementById(id);
@@ -147,8 +184,8 @@ function card(d){
   if(d.data_quality!=="complete") tags.push(`<span class="tag warn">${esc(d.data_quality)}</span>`);
   if(d.gs_rating) tags.push(`<span class="tag">GS ★ ${d.gs_rating} (${d.gs_reviews||0})</span>`);
   const acts=[];
-  if(d.phone_landline) acts.push(`<a class="call" href="${tel(d.phone_landline)}">📞 ${esc(d.phone_landline)}</a>`);
-  if(d.phone_mobile) acts.push(`<a class="${d.phone_landline?"":"call"}" href="${tel(d.phone_mobile)}">📱 ${esc(d.phone_mobile)}</a>`);
+  if(d.phone_landline) acts.push(`<a class="call" href="${tel(d.phone_landline)}">📞 ${esc(d.phone_landline)}</a><button class="btn cp" data-v="${esc(d.phone_landline)}" aria-label="Copy number">Copy</button>`);
+  if(d.phone_mobile) acts.push(`<a class="${d.phone_landline?"":"call"}" href="${tel(d.phone_mobile)}">📱 ${esc(d.phone_mobile)}</a><button class="btn cp" data-v="${esc(d.phone_mobile)}" aria-label="Copy number">Copy</button>`);
   if(d.email) acts.push(`<a href="mailto:${esc(d.email)}">✉ ${esc(d.email)}</a>`);
   if(d.website) acts.push(`<a href="${esc(url(d.website))}" target="_blank" rel="noopener">Website</a>`);
   if(d.contact_form && d.contact_form!==d.website) acts.push(`<a href="${esc(d.contact_form)}" target="_blank" rel="noopener">Contact form</a>`);
@@ -188,14 +225,27 @@ $("counters").addEventListener("click",e=>{ const c=e.target.closest(".chip"); i
   else $(c.dataset.k).value = $(c.dataset.k).value===c.dataset.v ? "" : c.dataset.v;
   refreshTowns(); render(); });
 $("list").addEventListener("change",e=>{ const card=e.target.closest(".card"); if(!card||!e.target.classList.contains("status")) return;
-  const id=card.dataset.id; store[id]={...(store[id]||{}),status:e.target.value,t:Date.now()}; save(); counters(); toast("Status saved"); });
+  const id=card.dataset.id; store[id]={...(store[id]||{}),status:e.target.value,t:Date.now()}; save(id); counters(); toast("Status saved"); });
 $("list").addEventListener("input",e=>{ const card=e.target.closest(".card"); if(!card||!e.target.classList.contains("notes")) return;
-  const id=card.dataset.id; store[id]={...(store[id]||{}),notes:e.target.value,t:Date.now()}; save(); });
-$("list").addEventListener("click",async e=>{ if(!e.target.classList.contains("copy")) return;
+  const id=card.dataset.id; store[id]={...(store[id]||{}),notes:e.target.value,t:Date.now()}; save(id, 800); });
+function copyText(text, msg){
+  const fallback=()=>{ const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");}catch(e){} ta.remove(); toast(msg); };
+  try { navigator.clipboard.writeText(text).then(()=>toast(msg), fallback); } catch(err){ fallback(); }
+}
+$("list").addEventListener("click",e=>{
+  if(e.target.classList.contains("cp")) { copyText(e.target.dataset.v, "Number copied"); return; }
+  if(!e.target.classList.contains("copy")) return;
   const d=DATA.find(x=>x.id===e.target.closest(".card").dataset.id);
-  try { await navigator.clipboard.writeText(d.opener); toast("Opener copied"); }
-  catch(err){ const ta=document.createElement("textarea"); ta.value=d.opener; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); toast("Opener copied"); } });
-function download(name, text, type){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+  copyText(d.opener, "Opener copied"); });
+let downloads=null;
+async function download(name, text, type){
+  if (downloads) {
+    try { await downloads.save({filename:name, data:text}); toast("Saved"); }
+    catch(e){ if(e && e.code!=="declined") toast("Could not save the file here"); }
+    return;
+  }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 $("csv").onclick=()=>{
   const cols=["priority","name","owner","street","postcode","town","region","dist_gersthofen","phone_landline","phone_mobile","email","website","contact_form","knx_status","meister","size","contact_method","best_time","opener"];
   const q=v=>'"'+String(Array.isArray(v)?v.join("; "):v??"").replace(/"/g,'""')+'"';
@@ -203,10 +253,14 @@ $("csv").onclick=()=>{
   download(`knx-leads-${new Date().toISOString().slice(0,10)}.csv`, "﻿"+rows.join("\n"), "text/csv;charset=utf-8");
 };
 $("backup").onclick=()=>download(`knx-leads-status-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(store), "application/json");
-$("restore").onchange=e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(t=>{ try { store={...store,...JSON.parse(t)}; save(); render(); toast("Restored"); } catch(err){ toast("Invalid file"); } }); };
+$("restore").onchange=e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(async t=>{ let add; try { add=JSON.parse(t); } catch(err){ toast("Invalid file"); return; }
+  store={...store,...add}; saveLocal(); render(); toast("Restored");
+  for (const id of Object.keys(add)) { if (remote) await writeRemote(id); } }); };
 $("ftoggle").onclick=()=>{ const f=$("filters"); f.classList.toggle("collapsed"); $("ftoggle").textContent=f.classList.contains("collapsed")?"Filters ▾":"Filters ▴"; };
 $("filters").classList.add("collapsed");
 render();
+initRemote();
+if (window.claude && window.claude.use) claude.use("downloads").then(d=>{ downloads=d; }).catch(()=>{});
 </script>
 </body>
 </html>
