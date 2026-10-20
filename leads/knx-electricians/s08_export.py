@@ -1,5 +1,5 @@
 """Write output/electricians.csv, output/electricians.xlsx and output/dashboard.html."""
-import csv, json, re
+import csv, hashlib, json, re, shutil
 from pathlib import Path
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
@@ -42,6 +42,42 @@ def load():
     return leads
 
 
+PWA_SRC = BASE / "pwa"
+
+
+def build_apps(data):
+    """output/pwa/ (installable app + leads.json), output/dashboard.html (single file, data embedded)
+    and output/knx-partner-leads.html (claude.ai page) -- all from the sources in pwa/."""
+    payload = {"date": TODAY, "leads": data}
+    dest = OUT / "pwa"
+    if dest.exists():
+        shutil.rmtree(dest)
+    shutil.copytree(PWA_SRC, dest)
+    leads_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    (dest / "leads.json").write_text(leads_json, encoding="utf-8")
+    h = hashlib.sha256()
+    for f in sorted(dest.rglob("*")):
+        if f.is_file() and f.name != "sw.js":
+            h.update(f.read_bytes())
+    sw = dest / "sw.js"
+    sw.write_text(sw.read_text(encoding="utf-8").replace("__VERSION__", h.hexdigest()[:12]), encoding="utf-8")
+
+    page = (PWA_SRC / "index.html").read_text(encoding="utf-8")
+    page = re.sub(r"(?s)<!--pwa-->.*?<!--/pwa-->\n?", "", page)
+    css = (PWA_SRC / "styles.css").read_text(encoding="utf-8")
+    js = (PWA_SRC / "app.js").read_text(encoding="utf-8")
+    embed = ("window.EMBEDDED_DATE=" + json.dumps(TODAY) + ";window.EMBEDDED_LEADS="
+             + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";").replace("</", "<\\/")
+    page = page.replace('<link rel="stylesheet" href="styles.css">', "<style>\n" + css + "</style>")
+    page = page.replace('<script src="app.js"></script>', "<script>" + embed + "</script>\n<script>\n" + js + "</script>")
+    (OUT / "dashboard.html").write_text(page, encoding="utf-8")
+    # claude.ai page: the platform supplies the document skeleton
+    art = re.sub(r"(?is)<!doctype html>\s*<html[^>]*>\s*<head>\s*<meta charset[^>]*>\s*<meta name=\"viewport\"[^>]*>\s*", "", page)
+    art = re.sub(r"(?is)</head>\s*<body>", "", art)
+    art = re.sub(r"(?is)</body>\s*</html>\s*$", "", art)
+    (OUT / "knx-partner-leads.html").write_text(art, encoding="utf-8")
+
+
 def main():
     OUT.mkdir(exist_ok=True)
     leads = load()
@@ -77,14 +113,7 @@ def main():
             "knx_specialist", "knx_snippet", "services", "brands", "gs_rating", "gs_reviews", "data_quality",
             "contact_method", "contact_reason", "best_time", "opener", "source_urls", "impressum_url"]
     data = [{k: l.get(k) for k in keep} for l in leads]
-    tpl = (BASE / "dashboard_template.html").read_text(encoding="utf-8")
-    html = tpl.replace("/*__DATA__*/[]", json.dumps(data, ensure_ascii=False).replace("</", "<\\/")).replace("__DATE__", TODAY)
-    (OUT / "dashboard.html").write_text(html, encoding="utf-8")
-    # claude.ai artifact variant: the platform supplies the document skeleton
-    art = re.sub(r"(?is)<!doctype html>\s*<html[^>]*>\s*<head>\s*<meta charset[^>]*>\s*<meta name=\"viewport\"[^>]*>\s*", "", html)
-    art = re.sub(r"(?is)</head>\s*<body>", "", art)
-    art = re.sub(r"(?is)</body>\s*</html>\s*$", "", art)
-    (OUT / "knx-partner-leads.html").write_text(art, encoding="utf-8")
+    build_apps(data)
     print("exported", len(leads), "leads ->", OUT)
 
 
