@@ -91,6 +91,8 @@ def main():
         for e in site_mails:
             if e["v"] not in [x["v"] for x in emails]:
                 emails.append(e)
+        # chain/franchise addresses (e.g. a Euronics store page) are not the shop's own inbox
+        emails = [x for x in emails if not re.search(r"@(euronics|expert|ep-online|electronicpartner)\.", x["v"])]
         emails.sort(key=lambda e: not (dom and e["v"].endswith("@" + dom)))
         land = [p for p in phones if not is_mobile(p["v"])]
         mob = [p for p in phones if is_mobile(p["v"])]
@@ -127,6 +129,8 @@ def main():
         specialist = bool(SPECIALIST_NAME.search(name)) or kw.get("knx", 0) >= 15
         meister = "yes" if (kw.get("meister") or re.search(r"meister", name, re.I)) else ("unknown" if not ok_site else "not stated")
 
+        if ok_site and s.get("owner") and re.search(r"Leistung|Service|Kontakt|Team", s["owner"]):
+            s["owner"] = None
         L.update(knx_status=knx, knx_specialist=specialist, meister=meister, employees=emp,
                  owner=s.get("owner") if ok_site else None, legal_form=(s.get("legal_form") if ok_site else None),
                  services=services_list(kw), brands=brands(kw), knx_snippet=s.get("knx_snippet"),

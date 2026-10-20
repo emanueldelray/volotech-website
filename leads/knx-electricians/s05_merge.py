@@ -13,7 +13,7 @@ NEGATIVE = re.compile(
     r"media ?markt|saturn|expert\b|euronics|hausgeräte|hausgeraete|haushaltsgeräte|kundendienst|"
     r"elektromotoren|motoren|fahrrad|e-?bike|roller|auto(haus)?\b|kfz|kraftfahrzeug|fahrzeug|"
     r"ingenieurbüro|ingenieurbuero|planungsbüro|\bibh\b|stromspeicher discount|1komma5|enpal|zolar|"
-    r"kundend|großh|grosshdl|fachgroß|großhdl|datentechnik|ingenieur|baugruppen|electronic assembly|klangverw|medizin|kälte(?!.*elektro)|schrott|recycling|reparatur.?service|handy|smartphone|telekom|vodafone|o2\b|"
+    r"berufsgenossenschaft|innung\b|handwerkskammer|kundend|großh|grosshdl|fachgroß|großhdl|datentechnik|ingenieur|baugruppen|electronic assembly|klangverw|medizin|kälte(?!.*elektro)|schrott|recycling|reparatur.?service|handy|smartphone|telekom|vodafone|o2\b|"
     r"leuchtsysteme|lampen|leuchten|beleuchtung handel|zweirad|apotheke|schule|verein|stadtwerke|"
     r"bayernwerk|swm\b|lew\b|netze|umspann|kraftwerk|bahn|klinik|rewe|edeka|bauhaus|obi\b|hornbach|"
     r"sonepar|rexel|zajadacz|hagemeyer|ffl\b|würth|wuerth|conrad|reichelt|elektro ?maier großhandel|"
