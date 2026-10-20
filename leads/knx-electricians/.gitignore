@@ -1,0 +1,4 @@
+# Collected business data stays local (repo is public).
+data/
+output/
+__pycache__/

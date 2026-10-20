@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KNX Partner Leads</title>
+<!--pwa-->
+<link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+<meta name="theme-color" content="#1f3a5f">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<!--/pwa-->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>KNX Partner Leads · Elektrobetriebe Südbayern</h1>
+  <div class="sub"><span id="datadate"></span><span id="savemode">status &amp; notes are saved on this device (use “Backup” to keep a copy)</span></div>
+  <div class="counters" id="counters"></div>
+</header>
+<button class="btn ftoggle" id="ftoggle">Filters ▾</button>
+<div class="filters" id="filters">
+  <input class="search" id="q" type="search" placeholder="Search name, town, owner, phone, notes …">
+  <select id="f-region"><option value="">All regions</option></select>
+  <select id="f-town"><option value="">All towns</option></select>
+  <select id="f-knx"><option value="">All KNX status</option></select>
+  <select id="f-prio"><option value="">All priorities</option><option value="5">5</option><option value="4">4+</option><option value="3">3+</option><option value="2">2+</option></select>
+  <select id="f-method"><option value="">All channels</option></select>
+  <select id="f-status"><option value="">All statuses</option></select>
+  <select id="f-sort">
+    <option value="prio">Sort: priority</option><option value="dist">Sort: distance from Gersthofen</option>
+    <option value="name">Sort: name</option><option value="town">Sort: town</option><option value="recent">Sort: last edited</option>
+  </select>
+</div>
+<div class="bar">
+  <span class="count" id="count"></span>
+  <span style="flex:1"></span>
+  <button class="btn primary install" id="install">Install app</button>
+  <button class="btn primary update" id="update">Update available – reload</button>
+  <button class="btn" id="reset">Reset filters</button>
+  <button class="btn primary" id="csv">Export view (CSV)</button>
+  <button class="btn" id="backup">Backup</button>
+  <label class="btn">Restore<input type="file" id="restore" accept=".json,application/json" hidden></label>
+  <label class="btn">Load leads file<input type="file" id="importLeads" accept=".json,application/json" hidden></label>
+</div>
+<section class="empty" id="empty" hidden>
+  <h2>No lead data on this device yet</h2>
+  <p>Load the <b>leads.json</b> file that came with the app. It is stored on this device only and stays available offline.</p>
+  <label class="btn primary">Choose leads.json<input type="file" id="importLeads2" accept=".json,application/json" hidden></label>
+</section>
+<main id="list"></main>
+<button class="btn more" id="more">Show more</button>
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+<!--pwa-->
+<script>
+if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").then(reg => {
+      const offer = w => { window.offerUpdate && window.offerUpdate(w); };
+      if (reg.waiting && navigator.serviceWorker.controller) offer(reg.waiting);
+      reg.addEventListener("updatefound", () => {
+        const w = reg.installing;
+        w && w.addEventListener("statechange", () => {
+          if (w.state === "installed" && navigator.serviceWorker.controller) offer(w);
+        });
+      });
+    }).catch(() => {});
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (!reloaded) { reloaded = true; location.reload(); } });
+  });
+}
+</script>
+<!--/pwa-->
+</body>
+</html>
